@@ -1,0 +1,11 @@
+out/
+*minted*/
+build/
+*.pdf
+*.out
+*.toc
+*.aux
+*.log
+*.fls
+*.fdb*
+*.synctex*

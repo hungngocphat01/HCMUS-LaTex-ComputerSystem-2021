@@ -1,0 +1,418 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University Assignment Title Page 
+% LaTeX Template
+% Version 1.0 (27/12/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (http://en.wikibooks.org/wiki/LaTeX/Title_Creation)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Ôn tập cuối kỳ môn Kỹ thuật lập trình}
+%%%%%%%%%%%%%%%%%%%%%% PACKAGE INCLUSIONS %%%%%%%%%%%%%%%%%%%%%% 
+\documentclass[12pt]{report}
+\usepackage{extsizes}
+\usepackage[T5]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage[vietnamese,english]{babel}
+\usepackage{amsmath}
+\usepackage[outputdir=build,cache=false]{minted}
+% Xoá đoạn "[outputdir=build,cache=false]" ở dòng trên nếu compile trên Overleaf
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{listings}
+\usepackage[unicode]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{subfiles}
+\usepackage{forest}
+\usetikzlibrary{positioning, quotes}
+\usepackage{background}
+\usepackage{geometry}
+
+%%%%%%%%%%%%%%%%%%%%%% DOCUMENT FORMATTING %%%%%%%%%%%%%%%%%%%%%% 
+\geometry{
+    a4paper,
+    total={170mm,250mm},
+    left=20mm,
+    top=30mm,
+ }
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Lớp 19CTT4}
+\lhead{Tài liệu ôn tập Hệ thống máy tính - Hợp ngữ 8086}
+\rfoot{Trang \thepage}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.3em}
+\setlength{\headheight}{15pt}
+
+\AtBeginEnvironment{minted}{
+    \renewcommand{\fcolorbox}[4][]{#4}}
+%%%%%%%%%%%%%%%%%%%%%% MACRO DEFINITIONS %%%%%%%%%%%%%%%%%%%%%% 
+\newcommand{\nocontentsline}[3]{}
+\newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\renewenvironment{figure*}
+{\begin{figure}[H]\center}
+{\end{figure}}
+
+\newcommand{\codeh}[1]{\textcolor{red}{\code{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{\fill}
+
+    \centering
+    \textsc{\LARGE Đại học Khoa học Tự nhiên}\\[0.5cm]
+    \textsc{\large ĐẠI HỌC QUỐC GIA TP. HCM}\\[0.5cm]
+    
+    {\Large Lớp 19CTT4}\\[1.5cm]
+
+    \rule{\textwidth}{0.4pt} \\[0.4cm]
+    {
+        \huge \bfseries Tài liệu ôn thi Hệ thống máy tính\\
+        Nội dung: Hợp ngữ 8086
+    }
+    \rule{\textwidth}{0.4pt}\\[1.5cm]
+    
+    {\Large Học kỳ 2, 2020 -- 2021}\\[1.5cm]
+    Đảm nhiệm soạn thảo: Hùng Ngọc Phát
+    \vspace*{\fill}
+
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\renewcommand*\contentsname{Mục lục}
+\tableofcontents
+\pagebreak
+
+\chapter{Lý thuyết}
+\pagebreak
+
+\section{Hệ thống các thanh ghi trong 8086}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image/cpu.png}
+    \caption{Tổ chức các thanh ghi cơ bản bên trong VXL 8086}
+\end{figure}
+
+\subsection*{Các thanh ghi đa năng (general purpose registers)}
+Vi xử lý 8086 có 8 thanh ghi đa năng gồm:
+\begin{itemize}
+    \item \code{AX, BX, CX, DX}: các thanh ghi thường sử dụng nhất. Dùng để chứa các tham số đầu vào cũng như kết quả trả về sau khi thực hiện các lệnh.
+    \par 4 thanh ghi này có độ dài 16-bit, mỗi thanh ghi được chia làm 2 thanh ghi nhỏ hơn có độ dài 8-bit là \code{AH, AL; BH, BL; CH, CL} và \code{DH, DL}.
+    \item \code{SI} (source index): thanh ghi con trỏ nguồn.
+    \item \code{DI} (destination index): thanh ghi con trỏ đích.
+    \item \code{SP} (stack pointer): thanh ghi trỏ đến đỉnh stack.
+    \item \code{BP} (base pointer): ?
+\end{itemize}
+
+Tên của các thanh ghi trên được đặt ra bởi những người tạo ra kiến trúc 8086, tuy nhiên những người lập trình có thể sử dụng chúng tuỳ thích phù hợp với mục đích của mình, nhưng phải tuân theo một số quy luật nhất định.\bigskip
+
+Mỗi thanh ghi trong 4 thanh ghi đa năng \code{AX, BX, CX, DX} được chia làm 2 phần gọi là high và low. Ví dụ \code{AX} được cấu thành bởi 2 thành phần là \code{AH} và \code{AL}.\\
+Giả sử ta có một số thập phân là \code{12345}. Số này được biểu diễn trong hệ nhị phân là \textcolor{red}{\code{00110000}}\textcolor{blue}{\code{00111001}}\code{b}. Khi ta lưu trữ nó trong thanh ghi \code{AX}, nó sẽ được chia làm 2 phần như sau:
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[mybox/.style={minimum width=3cm,draw,thick,align=center,minimum height=0.5cm}]
+        \node[mybox,label=below:\code{AH},text=red] (AH) {\code{00110000}};
+        \node[left=1cm of AH] {\code{AX}};
+        \node[right=0pt of AH,mybox,label=below:\code{AL},text=blue] (AL) {\code{00111001}};
+    
+    \end{tikzpicture}
+    \caption{Minh hoạ lưu trữ giá trị trong thanh ghi AX.}
+\end{figure}
+
+Vì vậy, khi ta thay đổi giá trị của các thanh ghi low và high thì giá trị của thanh ghi lớn cũng bị thay đổi theo và ngược lại.
+
+\subsection*{Các thanh ghi đoạn (segment registers)}
+\begin{itemize}
+    \item \code{CS} (code segment): trỏ đến đoạn bộ nhớ chứa code thực thi của chương trình.
+    \item \code{DS} (data segment): trỏ đến đoạn bộ nhớ chứa giá trị của các biến cục bộ.
+    \item \code{ES} (extra segment): trỏ đến một đoạn bộ nhớ tuỳ chỉnh. Người sử dụng tự định nghĩa.
+    \item \code{SS} (stack segment): trỏ đến đoạn bộ nhớ chứa stack.
+\end{itemize}
+
+Để thuận tiện cho việc quản lý, bộ nhớ vật lý trên máy tính được phân chia thành nhiều khu vực logic khác nhau, được gọi là các \textit{đoạn} (segment), mỗi đoạn có mỗi nhiệm vụ khác nhau. Các vùng nhớ cụ thể bên trong các đoạn được gọi là các \textit{offset}.
+
+Ta có thể hiểu đại khái một ``đoạn'' giống như một con đường, còn một offset nằm trong đoạn đó giống như một số nhà nằm trên con đường đó.
+
+Thanh ghi đoạn được sử dụng phối hợp cùng với các thanh ghi đa năng để ghi lại địa chỉ của các ô nhớ. Khi đó thanh ghi đoạn sẽ được sử dụng để chứa địa chỉ đoạn, còn thanh ghi đa năng sẽ được dùng để chứa địa chỉ lệch (offset) của ô nhớ đó tính từ đầu đoạn. Cả 2 kết hợp lại tạo nên \textit{địa chỉ vật lý} của ô nhớ đó.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \node[] (segment) {\bfseries Đường Nguyễn Trung Trực};
+        \node[right=1cm of segment] (offset) {\bfseries Số 56};
+
+        \node[below=1cm of segment,align=center] (segment_desc) {Địa chỉ đoạn};
+        \node[below=1cm of offset,align=center] (offset_desc) {Địa chỉ lệch\\ \textit{cái nhà thứ 56 tính từ đầu đường}};
+
+        \draw[->, line width=1pt] (segment_desc) edge (segment);
+        \draw[->, line width=1pt] (offset_desc) edge (offset);
+    \end{tikzpicture}
+\end{figure}
+
+Địa chỉ vật lý (physical address) được tạo thành từ địa chỉ trong chỉ 1 thanh ghi đoạn (segment address) và 1 thanh ghi đa năng (offset address) được tính bằng công thức sau:
+
+\begin{center}
+\begin{verbatim}
+    physical = segment address * 10h + offset.
+\end{verbatim}
+\end{center}
+
+Vd: Nếu ta có \code{segment address = 1230h} và \code{offset = 45h} (ô nhớ thứ \code{45h} tính từ đầu đoạn \code{1230h}) thì địa chỉ vật lý được tạo từ 2 địa chỉ này là \code{12345h}. Offset còn được gọi là effective address (địa chỉ hiệu quả).\bigskip
+
+Nếu ta có một thanh ghi đoạn là \code{DS} và một thanh ghi đa năng là \code{DX} thì địa chỉ vật lý được tạo bởi 2 địa chỉ chứa trong 2 thanh ghi trên được kí hiệu là \code{DS:DX} và có giá trị là \code{DS * 10h + DX}. 
+
+Vd: Nếu ta có \code{DS = 1230h} và \code{DX = 45h} thì \code{DS:DX = 12345h}.\bigskip
+
+\textbf{Ý nghĩa của thanh ghi đoạn:} giả sử ta có thanh ghi đoạn \code{DS} mang giá trị là \code{1230h} (xem lại định nghĩa của \code{DS} ở trên). Bên trong chương trình, ta khai báo 3 biến sau, mỗi biến chứa 4 byte dữ liệu.
+\begin{minted}[]{c}
+    a = 123
+    b = 456
+    c = 789
+\end{minted}
+Thì biến \code a sẽ có offset là \code 0 (vì nó được khai báo đầu tiên, giống như index \code 0 của phần tử đầu tiên trong mảng). Do \code b nằm ngay sau \code a nên nó sẽ có offset là \code{0 + 4} (do \code a có kích thước là 4 byte). Vậy ta cũng có thể suy ra \code c nằm ở offset số \code 8.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[mybox/.style={minimum width=3cm,draw,thick,align=center,minimum height=0.5cm}]
+        \node[mybox] (a) {\code{123d}};
+        \node[right=0pt of a, mybox] (b) {\code{456d}};
+        \node[right=0pt of b, mybox] (c) {\code{789d}};
+
+        \node[anchor=east,left=1cm] (DS) at (a.west) {\code{DS=1230h}};
+        
+        \node[anchor=north] (a_label) at (a.south) {\code{a}};
+        \node[anchor=north] (a_offset) at (a_label.south) {\code{Offset 0}};
+
+        \node[anchor=north] (b_label) at (b.south) {\code{b}};
+        \node[anchor=north] (b_offset) at (b_label.south) {\code{Offset 4}};
+
+        \node[anchor=north] (c_label) at (c.south) {\code{c}};
+        \node[anchor=north] (c_offset) at (c_label.south) {\code{Offset 8}};
+    
+    \end{tikzpicture}
+    \caption{Minh hoạ về offset}
+\end{figure}
+
+Như vậy địa chỉ vật lý của 3 biến trên lần lượt là:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+    Biến        & Offset    & Physical addr.          \\
+    \hline
+    \code{a}    & 0         & 1230h * 10h + 0 = 12300h \\
+    \code{b}    & 4         & 1230h * 10h + 4 = 12304h \\
+    \code{c}    & 8         & 1230h * 10h + 8 = 12308h \\
+    \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Vận dụng:} giả sử \code{a, b, c} mang các kích thước khác nhau lần lượt là \code{2}, \code 4 và \code 6 byte. Hãy cho biết \code{a, b, c} lần lượt thuộc các offset nào và có địa chỉ vật lý là gì? \\
+Đáp án:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+    Biến        & Offset    & Physical addr.          \\
+    \hline
+    \code{a}    & 0h         & 1230h * 10h + 0h = 12300h \\
+    \code{b}    & 2h         & 1230h * 10h + 2h = 12302h \\
+    \code{c}    & 6h         & 1230h * 10h + 6h = 12306h \\
+    \code{d}    & 12d = Ch   & 1230h * 10h + Ch = 1230Ch \\
+    \hline
+    \end{tabular}
+\end{table}
+
+\subsection*{Các thanh ghi đặc biệt (special purpose registers)}
+\begin{itemize}
+    \item \code{IP} (instruction pointer): trỏ đến đoạn code đang được thực thi.
+    \item Thanh ghi cờ hiệu (flag register): giống như một ``biến toàn cục'' bên trong CPU. Các bit của nó sẽ bị thay đổi giá trị tuỳ thuộc vào kết quả trả về của lệnh mà ta vừa thực hiện trước đó.
+\end{itemize}
+
+\subsubsection*{Giải thích các bit cờ hiệu phổ biến}
+\paragraph{SF (sign flag)}
+Sẽ được gán thành \code 1 nếu most significant bit của kết quả của phép tính vừa thực hiện là \code 1, hay nói cách khác, kết quả bị âm. Cờ này mang giá trị \code 0 nếu ngược lại.\\
+\textit{Vd:} \code{01001100b + 01100001b =} \textcolor{red}{\code 1}\code{0101101b}.\\ 
+Khi đó \code{SF = 1}.
+\bigskip
+
+\paragraph{ZF (zero flag)}
+Sẽ được gán thành 1 nếu kết quả của phép tính vừa thực hiện là 0.
+\bigskip 
+
+\paragraph{PF (parity flag)}
+Sẽ được gán thành \code 1 nếu trong kết quả của phép tính vừa rồi có một số \textit{chẵn} các bit \code 1. Nếu không có bit \code 1 nào thì \code{PF} cũng bằng \code 1 (vì 0 cũng là chẵn).
+\textit{Vd:} \code{01001100b + 01100001b = 10101101b}. Có 5 bit \code 1, nên cờ này sẽ mang giá trị \code 0.
+
+\paragraph{OF (overflow flag)}
+\code{OF} sẽ mang giá trị \code 1 nếu như kết quả của phép tính \textit{có dấu} vừa thực hiện bị \textit{tràn số}, tức là số lượng bit của kết quả phép tính vượt quá số lượng bit cho phép của thanh ghi. \\
+Hiện tượng overflow chỉ xảy ra khi  2 toán hạng đều \textbf{cùng dấu}. Dưới đây là 2 dấu hiệu của hiện tượng overflow:
+\begin{itemize}
+    \item \code{Số âm + số âm = số dương}.
+        \par Vd: \codeh{1}\code{111b + } \codeh{1}\code{000b = } \codeh{0}\code{000b} (các hạng tử đều là 4-bit)\\(biểu diễn trong hệ cơ số 10: \code{-1 + (-8) = 0}).
+    \item \code{Số dương + số dương = số âm}.
+        \par Vd: \codeh{0}\code{111b + }\codeh{0}\code{001b = }\codeh{1}\code{111b}\\(biểu diễn trong hệ 10: \code{7 + 1 = -1}). 
+\end{itemize}
+\textbf{Lưu ý:} Khi thực hiện các phép tính \textit{có dấu}, MSB (bit trái nhất) của các toán hạng và kết quả được ``để dành'' làm bit dấu. Do đó, hiện tượng tràn số chỉ xảy ra khi ta thực hiện các phép tính \textit{có dấu} và 2 toán hạng phải \textit{có cùng dấu}.\\
+Vd: \codeh{1}\code{111b + } \codeh{0}\code{001b = } \codeh{0}\code{000b} (biểu diễn hệ 10: \code{-1 + 1 = 0}). Lúc này dù bit dấu bị lật nhưng nó lại không phải là overflow vì khi đó 2 toán hạng trái dấu.
+
+\paragraph{CF (carry flag)}
+\code{CF} sẽ mang giá trị \code 1 nếu phép tính \textit{không dấu} vừa thực hiện vượt quá phạm vi biểu diễn của thanh ghi chứa kết quả, tức là số lượng bit của kết quả phép tính vượt quá số lượng bit cho phép của thanh ghi. Cụ thể như sau:
+\begin{itemize}
+    \item Khi ta thực hiện phép cộng mà số được nhớ nằm ngoài vùng biểu diễn của thanh ghi.
+        \begin{verbatim}
+            1111b 
+          + 0001b 
+            -----
+           .0000b 
+        \end{verbatim}
+    Ta thấy khi ta thực hiện xong phép cộng này, vẫn còn 1 số \code 1 được ``nhớ'' ở ngoài cùng bên trái, nhưng nó lại nằm ngoài vùng biểu diễn của thanh ghi này (vì nó chỉ có 4 bit).
+    \item Khi ta thực hiện phép trừ mà số được ``mượn'' nằm ngoài vùng biểu diễn của thanh ghi.
+        \begin{verbatim}
+            0000b 
+          - 0001b 
+            -----
+           .1111b 
+        \end{verbatim}
+    Ta thấy khi ta thực hiện xong phép trừ này, vẫn còn 1 số \code 1 được ``mượn'' mà chưa trả nằm ở ngoài cùng bên trái của kết quả, nhưng nó lại nằm ngoài vùng biểu diễn của 2 thanh ghi toán hạng, nên ta không thể ``trả'' được.
+\end{itemize}
+
+\paragraph{Phân biệt carry và overflow}:
+\begin{itemize}
+    \item \textbf{Giống nhau:} đều là hiện tượng khi thực hiện phép toán trên 2 số nhị phân thì kết quả bị vượt ra ngoài phạm vi biểu diễn cho phép của thanh ghi.
+    \item \textbf{Khác nhau:} \begin{itemize}
+        \item Overflow chỉ xảy ra khi thực hiện phép tính \textit{có dấu}, và 2 toán hạng phải có \code{cùng dấu}. 
+        \item Carry chỉ xảy ra khi ta thực hiện phép tính \textit{không dấu}.
+        \item Carry và overflow không bao giờ xảy ra đồng thời.
+        \item Định nghĩa của \textit{có dấu} hay \textit{không dấu} được xét trong hệ nhị phân (dựa vào việc xét hay không xét bit dấu).
+    \end{itemize}
+\end{itemize}
+
+\textbf{Một số ví dụ:} 
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{|l|l|l|l|l|l|l|}
+    \hline
+    Biểu thức & Phép tính có/không dấu & SF & ZF & PF & OF & CF \\
+    \hline
+    \code{1111b + 1000b = 0000b} & Có    & 0  & 1  & 1  & 1  & 0 \\
+    \code{0101b + 0111b = 1000b} & Có    & 0  & 1  & 1  & 1  & 0 \\
+    \code{1111b + 0000b = 0001b} & Không & 0  & 0  & 0  & 0  & 1 \\
+    \code{1111b - 0011b = 1100b} & Có    & 1  & 0  & 1  & 0  & 0 \\
+    \code{0000b - 0001b = 1111b} & Không & 1  & 0  & 1  & 0  & 1 \\
+    \hline
+    \end{tabular}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Truy cập bộ nhớ}
+
+
+\section{Cấu trúc chung của một chương trình hợp ngữ 8086}
+
+\section{Biến và mảng}
+
+\section{Ngắt (interrupt)}
+
+\section{Nhập xuất dữ liệu}
+
+\section{Các phép toán số học và logic}
+
+\section{Các cấu trúc điều khiển}
+
+\section{Thủ tục}
+
+\section{Macro}
+
+\section{Stack}
+
+\chapter{Bài tập}
+
+
+% \bibliographystyle{IEEEtran}
+% \bibliography{bib}
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Comments can be added to the margins of the document using the \todo{Here's a comment in the margin!} todo command, as shown in the example on the right. You can also add inline comments too:
+
+% \todo[inline, color=green!40]{This is an inline comment.}
+
+
+
+% \subsection{Tables and Figures}
+
+% Use the table and tabular commands for basic tables --- see Table~\ref{tab:widgets}, for example. You can upload a figure (JPEG, PNG or PDF) using the files menu. To include it in your document, use the includegraphics command as in the code for Figure~\ref{fig:frog} below.
+
+% % % Commands to include a figure:
+% % \begin{figure}
+% % \centering
+% % \includegraphics[width=0.5\textwidth]{frog.jpg}
+% % \caption{\label{fig:frog}This is a figure caption.}
+% % \end{figure}
+
+% % \begin{table}
+% % \centering
+% % \begin{tabular}{l|r}
+% % Item & Quantity \\\hline
+% % Widgets & 42 \\
+% % Gadgets & 13
+% % \end{tabular}
+% % \caption{\label{tab:widgets}An example table.}
+% % \end{table}
+
+% \subsection{Mathematics}
+
+% \LaTeX{} is great at typesetting mathematics. Let $X_1, X_2, \ldots, X_n$ be a sequence of independent and identically distributed random variables with $\text{E}[X_i] = \mu$ and $\text{Var}[X_i] = \sigma^2 < \infty$, and let
+% $$S_n = \frac{X_1 + X_2 + \cdots + X_n}{n}
+%       = \frac{1}{n}\sum_{i}^{n} X_i$$
+% denote their mean. Then as $n$ approaches infinity, the random variables $\sqrt{n}(S_n - \mu)$ converge in distribution to a normal $\mathcal{N}(0, \sigma^2)$.
+
+% \subsection{Lists}
+
+% You can make lists with automatic numbering \dots
+
+% \begin{enumerate}
+% \item Like this,
+% \item and like this.
+% \end{enumerate}
+% \dots or bullet points \dots
+% \begin{itemize}
+% \item Like this,
+% \item and like this.
+% \end{itemize}
+
+% We hope you find write\LaTeX\ useful, and please let us know if you have any feedback using the help menu above.
+
