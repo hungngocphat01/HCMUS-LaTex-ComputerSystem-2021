@@ -19,6 +19,8 @@ $ pip3 install pygmentize
 - Cài đặt một trình soạn thảo TeX như TeX Studio.
 - Import file `main.tex` vào trình soạn thảo TeX vừa cài đặt.
 - Cài đặt thư mục xuất file pdf là `build` (thay đổi tham số dòng lệnh trong cài đặt của trình soạn thảo).
+  - Thay đổi tham số dòng lệnh của recipe `latexmk` và thêm tham số sau vào: `-outdir=build`.
+- Build với recipe là `latexmk`.
 
 ### C2: Sử dụng TeX toolchain và GNU make
 - Cách này được khuyến khích nếu sử dụng Linux hoặc macOS. Trên Windows để cài được python "cho đúng cách" và cái GNU make là cả một niềm đau (fck microsoft).
