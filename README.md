@@ -42,6 +42,7 @@ $ make
 - Sau khi cài xong, mở config của extension lên và thay đổi các trường:
   - `LaTeX: Bib Dirs`: thêm vào `%DIR%`.
   - `LaTeX: Out Dir`: gán thành `%DIR/build`.
+- Mở thư mục của project bằng VSC.
 - Nhấn vào logo TeX bên sidebar của VSC và chọn "Build LaTeX Project"
 - File sau khi được build xong sẽ nằm trong thư mục `build` với tên `main.pdf`.
 
