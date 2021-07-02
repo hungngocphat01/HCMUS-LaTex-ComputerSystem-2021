@@ -36,6 +36,15 @@ $ make
 ```
 - File sau khi được build xong sẽ nằm trong thư mục `build` với tên `main.pdf`.
 
-## Overleaf
+## C3: Sử dụng Visual Studio Code
+- Cài VSC.
+- Cài extension "LaTex Workshop".
+- Sau khi cài xong, mở config của extension lên và thay đổi các trường:
+  - `LaTeX: Bib Dirs`: thêm vào `%DIR%`.
+  - `LaTeX: Out Dir`: gán thành `%DIR/build`.
+- Nhấn vào logo TeX bên sidebar của VSC và chọn "Build LaTeX Project"
+- File sau khi được build xong sẽ nằm trong thư mục `build` với tên `main.pdf`.
+
+## C4: Overleaf
 - Không cần cài gì cả.
 - Upload hết thư mục trên lên overleaf và nó sẽ tự compile được.
