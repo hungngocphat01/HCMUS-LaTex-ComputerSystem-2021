@@ -98,22 +98,33 @@
     \rule{\textwidth}{0.4pt}\\[1.5cm]
     
     {\Large Học kỳ 2, 2020 -- 2021}\\[1.5cm]
-    Đảm nhiệm soạn thảo: Hùng Ngọc Phát \\
-    Powered by \LaTeXe
+    {\large Đảm nhiệm soạn thảo: Hùng Ngọc Phát \\
+    Powered by \LaTeXe}
     \vspace*{\fill}
 
 \end{titlepage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section*{Lời nói đầu}
+Tài liệu \textit{Ôn thi cuối kỳ Hệ thống máy tính - Hợp ngữ 8086} này được soạn vào học kỳ 2, năm học 2020 - 2021 (07/2021). Vì mỗi bạn học mỗi lớp khác nhau nên chương trình học có lớp kiểu này có lớp kiểu kia (vd như lớp 2 không học \code{MIPS} mà tất cả đều code \code{x86}). Trong tài liệu này, mình sẽ cố gắng tóm tắt lại \textbf{tất cả} nội dung của hợp ngữ 8086 \textit{cơ bản} theo sườn nội dung được cung cấp bởi \code{jbwyatt}, người viết ra trình giả lập \code{emu8086} và slide của lớp \code{19\_3} (soạn bởi thầy Lê Viết Long). Bạn nào không học phần nào trên lớp có thể bỏ qua, không cần đọc phần đấy.\bigskip
+
+Ngoài ra, bởi vì phần lý thuyết rất là dài nên các bạn nên đọc phần \ref{chapterBaiTap} \code{Bài tập} trước rồi nếu không hiểu vì sao nó lại như vậy thì đọc phần \ref{chapterLyThuyet} \code{Lý thuyết} sau. \bigskip
+
+Chúc các bạn thi tốt và qua được cái môn {\tiny củ lìn} này.\\
+\vspace*{\fill}
+
+{\LaTeX} source code: \href{https://github.com/hungngocphat01/LaTex-ComputerSystem-2021}{github: hungngocphat01/LaTex-ComputerSystem-2021}.
+\pagebreak
 
 \renewcommand*\contentsname{Mục lục}
 \setcounter{tocdepth}{2}
 \tableofcontents
 \pagebreak
 
-\chapter{Lý thuyết}
+\chapter{Lý thuyết} \label{chapterLyThuyet}
 \pagebreak
+
 
 \section{Hệ thống các thanh ghi trong 8086}
 
@@ -619,8 +630,9 @@ Giải thích:
     \end{itemize}
     \item Giả sử ta đã nhập vào chuỗi \code{"Dm assembly kho vcl"}. Chuỗi này gồm có 18 ký tự. Biến \code{str} sau khi nhập xong sẽ có giá trị là:
     \begin{verbatim}
-100, 18, "Dm assembly kho vcl"
+100, 18, "Dm assembly kho vcl" <các giá trị rác>
     \end{verbatim} 
+    \par Sau chuỗi này là giá trị rác, vì khi khai báo ta đã khai báo một chuỗi có 100 phần tử, nhưng chuỗi đọc được chỉ có 18 phần tử mà thôi. Do đó, 82 phần tử còn lại sẽ là giá trị rác.
 \end{itemize}
 
 \section{Các phép toán số học và logic}
@@ -635,6 +647,7 @@ mov ax, 12d
 add ax, 8d  ; ax += 8
             ; ax = 12 + 8 = 20 
 \end{minted}
+Lệnh này tác động đến các cờ \code{AF, CF, OF, PF, SF, ZF}.
 
 \subsection{Phép trừ}
 Lệnh: \code{SUB}. Cú pháp và giới hạn tương tự lệnh \code{ADD}.
@@ -644,6 +657,7 @@ mov bx, 2d
 sub ax, bx  ; ax -= 2
             ; ax = 12 - 2 = 10 
 \end{minted}
+Lệnh này tác động đến các cờ \code{AF, CF, OF, PF, SF, ZF}.
 
 \subsection{Phép nhân}
 Cú pháp: 
@@ -657,6 +671,8 @@ Có 2 trường hợp xảy ra:
     \item Nếu \code{X} có kích thước 16 bit (2 byte), lệnh này sẽ thực hiện phép gán: \code{DXAX = AX * X}.
     \par trong đó DXAX là một thanh ghi tổ hợp (tưởng tượng) gồm high là DX và low là AX.
 \end{itemize} 
+Lệnh này chỉ tác động đến các cờ \code{CF, OF}.
+
 
 \begin{minted}[breaklines]{asm}
 ; Demo TH1 
@@ -716,9 +732,113 @@ div bx          ; AX = thương = 1205h
                 ; DX = dư = 679Fh
 
 \end{minted}
+Lệnh này không tác động đến cờ.
+
+\subsection{Lệnh \code{INC} và \code{DEC}}
+Cú pháp:
+\begin{minted}[]{asm}
+inc X
+dec X
+\end{minted}
+Tương đương với 2 dòng C sau:
+\begin{minted}[]{asm}
+X++
+X--
+\end{minted}
+Vd:
+\begin{minted}[]{asm}
+mov ax, 12d 
+inc ax          ; ax = 13d
+mov bx, 70d     
+dec bx          ; bx = 69d
+\end{minted}
+2 lệnh này thay đổi cờ tương tự như \code{ADD} và \code{SUB}.
+
+\subsection{Các phép toán logic}
+\subsubsection{Lệnh \code{AND}}
+\begin{minted}[]{asm}
+and dest, src
+\end{minted}
+Lệnh \code{AND} nhận vào 2 tham số như trên và thực hiện phép gán: \code{dest = dest \& src}.\\
+Vd:
+\begin{minted}[]{asm}
+mov ah, 10110110b
+mov al, 01101010b
+and ah, al          ; AH = AH and AL 
+; KQ: AH = 00100010b
+\end{minted}
+\begin{verbatim}
+    10110110b
+  & 01101010b
+    ---------
+    00100010b
+\end{verbatim}
+
+\subsubsection{Lệnh \code{OR}, \code{XOR}}
+Tương tự lệnh \code{AND}.
+\begin{minted}[]{asm}
+mov ah, 10110110b
+mov al, 01101010b
+or ah, al          ; AH = AH or AL 
+; KQ: AH = 11111110b
+\end{minted}
+
+\subsubsection{Lệnh \code{NOT}}
+\begin{minted}[]{asm}
+not X
+\end{minted}
+Lệnh \code{NOT} nhận vào 1 tham số như trên và thực hiện phép gán: \code{X = not X} (đảo các bit của \code X).
+Vd:
+\begin{minted}[]{asm}
+mov ah, 10110110b
+not ah
+; KQ:   01001001b
+\end{minted}
+
+\subsubsection{Lệnh \code{NEG}}
+Cú pháp:
+\begin{minted}[]{asm}
+neg X
+\end{minted}
+Lệnh này thực hiện đảo dấu của X bằng cách thực hiện lấy số bù 2.
+Vd:
+\begin{minted}[]{asm}
+mov ax, 01101100b
+neg ax 
+; ax = 10010100b
+\end{minted}
+
+\subsubsection{Các lệnh dịch bit}
+Có 2 lệnh dịch bit là \code{SHL} (shift left) và \code{SHR} (shift right). Chúng hoạt động giống toán tử \verb#<<# và \verb#>># trong C và có syntax tương tự nhau:
+\begin{minted}[]{asm}
+shl X
+shr X
+\end{minted}
+2 lệnh trên để dịch \code X qua trái (phải) 1 bit. Kết quả dịch sẽ được gán lại trực tiếp vào thanh ghi \code X, và bit bị ``rơi ra'' sẽ nằm trong thanh ghi cờ \code{CF}.\\
+Vd:
+\begin{minted}[]{asm}
+mov ah, 10010001b
+shl ah 
+; AH << 1 => AH = 00100010b, CF = 1
+
+mov ah, 10011100b
+shr ah 
+; AH >> 1 => AH = 01001110b, CF = 0
+\end{minted}
+Ngoài ra ta còn có thể dịch nhiều bit cùng lúc:
+\begin{minted}[]{asm}
+shl X, Y 
+shr X, Y
+\end{minted}
+Mã C tương ứng:
+\begin{minted}[]{asm}
+X << Y 
+X >> Y
+\end{minted}
 
 \section{Các cấu trúc điều khiển}
 
+\section{Cách chuyển cấu trúc điều khiển C sang Assembly}
 
 \section{Thủ tục}
 
@@ -726,7 +846,9 @@ div bx          ; AX = thương = 1205h
 
 \section{Stack}
 
-\chapter{Bài tập}
+\chapter{Một số chương trình cơ bản bằng Assembly 8086} \label{chapterBaiTap}
+
+
 
 \renewcommand{\bibname}{Tài liệu tham khảo}
 \bibliographystyle{IEEEtran}
