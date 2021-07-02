@@ -2,6 +2,7 @@ Mã nguồn LaTeX của tài liệu ôn tập Hợp ngữ 8086 của lớp 19CTT
 Soạn vào tháng 07/2021. 
 
 ## Hướng dẫn build
+Chỉ nên tự build nếu đã *rất quen* với cách compile LaTeX thủ công.
 - Clone về.
 - Cài đặt một bộ toolchain để compile LaTeX như TeX Live, MikTeX hay MacTeX (trên macOS/OS X).
 - Cài đặt Python (một cách thích hợp) và cài `pygmentize` từ `pip`:
@@ -34,3 +35,7 @@ $ cd LaTex-ComputerSystem-2021
 $ make
 ```
 - File sau khi được build xong sẽ nằm trong thư mục `build` với tên `main.pdf`.
+
+## Overleaf
+- Không cần cài gì cả.
+- Upload hết thư mục trên lên overleaf và nó sẽ tự compile được.
