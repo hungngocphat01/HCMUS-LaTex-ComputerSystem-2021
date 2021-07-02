@@ -2,7 +2,7 @@ Mã nguồn LaTeX của tài liệu ôn tập Hợp ngữ 8086 của lớp 19CTT
 Soạn vào tháng 07/2021. 
 
 ## Hướng dẫn build
-Chỉ nên tự build nếu đã *rất quen* với cách compile LaTeX thủ công.
+Chỉ nên tự build nếu đã *rất quen* với cách compile LaTeX thủ công (đặc biệt là xử lý các lỗi liên quan đến path như của thằng package `minted`).
 - Clone về.
 - Cài đặt một bộ toolchain để compile LaTeX như TeX Live, MikTeX hay MacTeX (trên macOS/OS X).
 - Cài đặt Python (một cách thích hợp) và cài `pygmentize` từ `pip`:
