@@ -98,7 +98,8 @@
     \rule{\textwidth}{0.4pt}\\[1.5cm]
     
     {\Large Học kỳ 2, 2020 -- 2021}\\[1.5cm]
-    Đảm nhiệm soạn thảo: Hùng Ngọc Phát
+    Đảm nhiệm soạn thảo: Hùng Ngọc Phát \\
+    Powered by \LaTeXe
     \vspace*{\fill}
 
 \end{titlepage}
@@ -107,6 +108,7 @@
 
 
 \renewcommand*\contentsname{Mục lục}
+\setcounter{tocdepth}{2}
 \tableofcontents
 \pagebreak
 
@@ -260,7 +262,7 @@ Như vậy địa chỉ vật lý của 3 biến trên lần lượt là:
 
 \subsubsection*{Giải thích các bit cờ hiệu phổ biến}
 \paragraph{SF (sign flag)}
-Sẽ được gán thành \code 1 nếu most significant bit của kết quả của phép tính vừa thực hiện là \code 1, hay nói cách khác, kết quả bị âm. Cờ này mang giá trị \code 0 nếu ngược lại.\\
+Sẽ được gán thành \code 1 nếu most significant bit của kết quả của phép tính vừa thực hiện là \code 1, hay nói cách khác, kết quả bị âm. Cờ này mang giá trị \code 0 nếu ngược lại.\break
 \textit{Vd:} \code{01001100b + 01100001b =} \textcolor{red}{\code 1}\code{0101101b}.\\ 
 Khi đó \code{SF = 1}.
 \bigskip
@@ -270,23 +272,20 @@ Sẽ được gán thành 1 nếu kết quả của phép tính vừa thực hi�
 \bigskip 
 
 \paragraph{PF (parity flag)}
-Sẽ được gán thành \code 1 nếu trong kết quả của phép tính vừa rồi có một số \textit{chẵn} các bit \code 1. Nếu không có bit \code 1 nào thì \code{PF} cũng bằng \code 1 (vì 0 cũng là chẵn).
+Sẽ được gán thành \code 1 nếu trong kết quả của phép tính vừa rồi có một số \textit{chẵn} các bit \code 1. Nếu không có bit \code 1 nào thì \code{PF} cũng bằng \code 1 (vì 0 cũng là chẵn).\\
 \textit{Vd:} \code{01001100b + 01100001b = 10101101b}. Có 5 bit \code 1, nên cờ này sẽ mang giá trị \code 0.
 
 \paragraph{OF (overflow flag)}
-\code{OF} sẽ mang giá trị \code 1 nếu như kết quả của phép tính \textit{có dấu} vừa thực hiện bị \textit{tràn số}, tức là số lượng bit của kết quả phép tính vượt quá số lượng bit cho phép của thanh ghi. \\
-Hiện tượng overflow chỉ xảy ra khi  2 toán hạng đều \textbf{cùng dấu}. Dưới đây là 2 dấu hiệu của hiện tượng overflow:
+\code{OF} được set thành \code 1 nếu như 2 số hạng ban đầu có MSB (bit trái nhất) bằng nhau nhưng tổng của 2 số hạng đó có MSB khác kết quả của 2 số hạng ban đầu.
 \begin{itemize}
-    \item \code{Số âm + số âm = số dương}.
-        \par Vd: \codeh{1}\code{111b + } \codeh{1}\code{000b = } \codeh{0}\code{000b} (các hạng tử đều là 4-bit)\\(biểu diễn trong hệ cơ số 10: \code{-1 + (-8) = 0}).
-    \item \code{Số dương + số dương = số âm}.
-        \par Vd: \codeh{0}\code{111b + }\codeh{0}\code{001b = }\codeh{1}\code{111b}\\(biểu diễn trong hệ 10: \code{7 + 1 = -1}). 
+    \item \codeh{1}\code{111b + }\codeh{1}\code{000b = } \codeh{0}\code{000b} $\Rightarrow$ \code{OF = 1}.
+    \item \codeh{0}\code{111b + }\codeh{0}\code{001b = }\codeh{1}\code{111b}. $\Rightarrow$ \code{OF = 1}.
+    \item \codeh{1}\code{111b + }\codeh{0}\code{001b = }\codeh{0}\code{000b}. $\Rightarrow$ \code{OF = 0}.
 \end{itemize}
-\textbf{Lưu ý:} Khi thực hiện các phép tính \textit{có dấu}, MSB (bit trái nhất) của các toán hạng và kết quả được ``để dành'' làm bit dấu. Do đó, hiện tượng tràn số chỉ xảy ra khi ta thực hiện các phép tính \textit{có dấu} và 2 toán hạng phải \textit{có cùng dấu}.\\
-Vd: \codeh{1}\code{111b + } \codeh{0}\code{001b = } \codeh{0}\code{000b} (biểu diễn hệ 10: \code{-1 + 1 = 0}). Lúc này dù bit dấu bị lật nhưng nó lại không phải là overflow vì khi đó 2 toán hạng trái dấu.
+Overflow flag chỉ bị tác động bởi phép cộng.
 
 \paragraph{CF (carry flag)}
-\code{CF} sẽ mang giá trị \code 1 nếu phép tính \textit{không dấu} vừa thực hiện vượt quá phạm vi biểu diễn của thanh ghi chứa kết quả, tức là số lượng bit của kết quả phép tính vượt quá số lượng bit cho phép của thanh ghi. Cụ thể như sau:
+\code{CF} sẽ mang giá trị \code 1 trong 2 trường hợp dưới đây:
 \begin{itemize}
     \item Khi ta thực hiện phép cộng mà số được nhớ nằm ngoài vùng biểu diễn của thanh ghi.
         \begin{verbatim}
@@ -306,47 +305,300 @@ Vd: \codeh{1}\code{111b + } \codeh{0}\code{001b = } \codeh{0}\code{000b} (biểu
     Ta thấy khi ta thực hiện xong phép trừ này, vẫn còn 1 số \code 1 được ``mượn'' mà chưa trả nằm ở ngoài cùng bên trái của kết quả, nhưng nó lại nằm ngoài vùng biểu diễn của 2 thanh ghi toán hạng, nên ta không thể ``trả'' được.
 \end{itemize}
 
-\paragraph{Phân biệt carry và overflow}:
-\begin{itemize}
-    \item \textbf{Giống nhau:} đều là hiện tượng khi thực hiện phép toán trên 2 số nhị phân thì kết quả bị vượt ra ngoài phạm vi biểu diễn cho phép của thanh ghi.
-    \item \textbf{Khác nhau:} \begin{itemize}
-        \item Overflow chỉ xảy ra khi thực hiện phép tính \textit{có dấu}, và 2 toán hạng phải có \code{cùng dấu}. 
-        \item Carry chỉ xảy ra khi ta thực hiện phép tính \textit{không dấu}.
-        \item Carry và overflow không bao giờ xảy ra đồng thời.
-        \item Định nghĩa của \textit{có dấu} hay \textit{không dấu} được xét trong hệ nhị phân (dựa vào việc xét hay không xét bit dấu).
-    \end{itemize}
-\end{itemize}
+\textit{Lưu ý: CPU không quan tâm phép tính bạn vừa thực hiện là có dấu hay không dấu, 2 số hạng là âm hay dương. Nó chỉ thực hiện việc cộng/trừ trên 2 toán hạng nhị phân và thực hiện việc set cờ tương ứng theo quy luật trên}.\cite{overflow_note}.
 
 \textbf{Một số ví dụ:} 
 \begin{figure}[H]
     \centering
     \begin{tabular}{|l|l|l|l|l|l|l|}
     \hline
-    Biểu thức & Phép tính có/không dấu & SF & ZF & PF & OF & CF \\
+    Biểu thức                    & SF & ZF & PF & OF & CF \\
     \hline
-    \code{1111b + 1000b = 0000b} & Có    & 0  & 1  & 1  & 1  & 0 \\
-    \code{0101b + 0111b = 1000b} & Có    & 0  & 1  & 1  & 1  & 0 \\
-    \code{1111b + 0000b = 0001b} & Không & 0  & 0  & 0  & 0  & 1 \\
-    \code{1111b - 0011b = 1100b} & Có    & 1  & 0  & 1  & 0  & 0 \\
-    \code{0000b - 0001b = 1111b} & Không & 1  & 0  & 1  & 0  & 1 \\
+    \code{1111b + 1000b = 0000b} & 0  & 1  & 1  & 1  & 1 \\
+    \code{0101b + 0111b = 1100b} & 1  & 0  & 1  & 1  & 0 \\
+    \code{1111b + 0010b = 0001b} & 0  & 0  & 0  & 0  & 1 \\
+    \code{1111b - 0011b = 1100b} & 1  & 0  & 1  & 0  & 0 \\
+    \code{0000b - 0001b = 1111b} & 1  & 0  & 1  & 0  & 1 \\
     \hline
     \end{tabular}
 \end{figure}
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Truy cập bộ nhớ}
-
-
 \section{Cấu trúc chung của một chương trình hợp ngữ 8086}
+Có rất nhiều cách để tổ chức một chương trình trong 8086 Asm vì sự đa dạng của compiler hồi đó. Tuy nhiên, ta có cách thường sử dụng sau:
+
+\begin{minted}[linenos]{asm}
+.model <kiểu bộ nhớ>
+.stack <địa chỉ của SS>
+
+.data
+    <khai báo các biến>
+
+.code 
+    <khai báo các thủ tục và macro>
+
+    main proc 
+        <nội dung hàm main>
+    endp
+
+end main ; kết thúc chương trình và nhắc compiler tên của hàm main
+\end{minted}
+Vd: 
+\begin{minted}[linenos]{asm}
+.model small
+.stack 100h
+
+.data
+    strHelloWorld db "Hello world$"
+
+.code 
+    printDXString proc 
+        mov ah, 09h
+        int 21h
+    endp
+
+    main proc 
+        lea dx, strHelloWorld
+        call printDXString
+    endp
+
+end main 
+\end{minted}
+
+\section{Truy cập bộ nhớ}
+\subsection{Sơ lược về truy cập bộ nhớ}
+Để truy cập vào một ô nhớ, ta có thể chứa địa chỉ offset của ô nhớ đó trong
+\begin{itemize}
+    \item Một thanh ghi con trỏ như \code{SI, DI}.
+    \item Thanh ghi \code{BX}.
+    \item Truy cập trực tiếp vào địa chỉ của ô nhớ đó (displacement). Có 2 loại địa chỉ là địa chỉ 8-bit (\code{d8}) và địa chỉ 16-bit (\code{d16}).
+\end{itemize}
+
+\textit{Lưu ý: Địa chỉ được chứa trong các thanh ghi SI, DI, BX hoặc d8, d16 là các địa chỉ offset. Địa chỉ vật lý thực sự của các ô nhớ đó thực chất là \code{DS:SI}, \code{DS:DI}, \code{DS:BX}, \code{DS:d8}, \code{DS:d16}. Cũng cần phải lưu ý một ô nhớ có kích thước là 1 byte}.
+\bigskip
+
+Ví dụ: Giả sử hệ điều hành cấp cho ta \code{DS = 1230h}.
+Để truy cập vào ô nhớ có địa chỉ vật lý là \code{12345h} bằng thanh ghi \code{SI} thì ta phải gán \code{SI = 45h} vì \code{DS:SI = 1230h * 10h + 45h = 12345h}.
+
+\subsection{Lệnh \code{mov}}
+\begin{minted}{asm}
+    mov dest, src
+\end{minted}
+Lệnh \code{mov} nhận vào 2 tham số là \code{src} và \code{dest} và có tác dụng gán giá trị của \code{src} cho \code{dest}.\\
+Mã C tương ứng: \code{dest = src;}
+
+2 tham số của lệnh \code{mov} có thể là:
+\begin{figure}[H]
+    \begin{minipage}{0.5\textwidth}
+\begin{verbatim}
+SYNTAX 
+
+mov REG, memory
+mov memory, REG
+mov REG, REG
+mov memory, imm
+mov REG, imm
+mov SREG, memory
+mov memory, SREG 
+mov SREG, SREG 
+mov SREG, REG
+\end{verbatim}
+    \end{minipage}
+    \hfill
+        \begin{minipage}{0.5\textwidth}
+\begin{verbatim}
+VÍ DỤ 
+
+mov AX, [0FFh]
+mov [0FFh], AX
+mov AX, BX
+mov [0CAFEh], 24h
+mov AX, 1234h
+mov ES, [0445h]
+mov [0445h], DS 
+mov ES, DS 
+mov DS, AX
+\end{verbatim}         
+         \end{minipage}
+\end{figure}
+
+Trong đó:
+\begin{itemize}
+    \item \code{REG} là một thanh ghi đa năng như \code{AX, BX, SI}.
+    \item \code{memory} là một địa chỉ bộ nhớ như \code{[0DEADh], [0BEEFh], [0CAFEh]}.
+    \item \code{imm} là một số như \code{1d, 2d, 0FFh, 024h, 1011b}.
+    \item \code{SREG} là một thanh ghi đoạn như \code{DS, ES, SS}.
+\end{itemize}
+
+Cú pháp \code{[memory]} nghĩa là ``nội dung ô nhớ tại địa chỉ \code{memory}''. Hay nói cách khác, đây là kí hiệu giải tham chiếu tương tự như dấu \code{*} trong C.
 
 \section{Biến và mảng}
+\subsection{Giới thiệu về biến}
+Biến trong 8086 Asm thường được khai báo ở data segment.
+Cú pháp khai báo biến:
+\begin{minted}{asm}
+<tên biến> <kích thước> <(các) giá trị>
+\end{minted}
+
+Tên biến tuân thủ theo các quy tắc đặt tên biến đã biết trước đây.
+Kích thước có thể là:
+\begin{itemize}
+    \item \code{db} (define byte): định nghĩa một biến có kích thước 1 byte.
+    \item \code{dw} (define word): định nghĩa biến kích thước 2 byte.
+    \item \code{dd} (define double [word]): định nghĩa biến có kích thước 4 byte.
+\end{itemize}
+
+Như đã nói ở phần trước, lưu ý rằng khi khai báo, các biến này sẽ nằm trong data segment. Để truy cập vào nội dung các biến này thông qua địa chỉ của chúng, các địa chỉ đó phải là địa chỉ offset được tính từ đầu data segment.
+
+Để có thể truy cập được nội dung của các biến đã khai báo trong data segment, đầu hàm main ta phải có đoạn code sau để nạp địa chỉ của data segment vào thanh ghi \code{DS}:
+\begin{minted}[linenos]{asm}
+mov ax, @data 
+mov ds, ax
+\end{minted}
+
+Một số ví dụ về khai báo biến:
+\begin{minted}[linenos]{asm}
+.data 
+    var0 db ?           ; biến 1 byte, giá trị không biết trước
+    var1 db 2           ; biến 1 byte, giá trị là 2d
+    var2 db 24h         ; biến 1 byte, giá trị là 24h
+    var3 db '$'         ; biến 1 byte, giá trị là 24h (mã ASCII của '$')
+    var4 dw DEADh       ; biến 2 byte, giá trị là DEADh
+    var5 dd DEADBEEFh   ; biến 4 byte, giá trị là DEADBEEFh
+\end{minted}
+
+\subsection{Khai báo mảng}
+Để khai báo một mảng, ta gán nhiều giá trị đầu cho chúng (một cách hình thức).
+
+\begin{minted}[linenos]{asm}
+.data
+    arr1 db 1, 2, 3, 4              ; mảng mà mỗi phần tử là 1 byte
+    arr2 dw DEADh, BEEFh, CAFEh     ; mảng có phần tử 2 byte
+    arr3 dd DEADBEEFh, 0DEADDADh    ; mảng có phần tử 4 byte
+\end{minted}
+Lưu ý: mảng trong Assembly không bị giới hạn bởi kích thước. Lập trình viên khi code phải tự đảm bảo rằng mình không đi vượt ra khỏi miền giá trị của mảng.
+
+Ngoài ra ta cũng có thể khai báo một mảng có kích thước cho sẵn (một cách hình thức):
+\begin{minted}[linenos]{asm}
+.data
+    arr1 db 100 dup(0)  ; mảng 100 phần tử mà mỗi pt là 1 byte, có giá trị 0
+    arr2 dw 100 dup(0)
+\end{minted}
+
+Như trong C, một chuỗi cũng là một mảng, và có kích thước mỗi phần tử là 1 byte (\code{db}).
+
+\subsection{Truy cập vào biến bằng \code{mov}}.
+Ta có thể truy cập trực tiếp vào giá trị của biến bằng lệnh mov:
+\begin{minted}[]{asm}
+var1 db 24h
+mov ax, var1    ; ax = 24h
+\end{minted}
+Ta có thể truy cập gián tiếp thông qua địa chỉ của nó:
+\begin{minted}[]{asm}
+var1 db 24h            
+mov bx, offset var1    ; bx = địa chỉ offset var1
+mov ax, [bx]           ; ax = *(ds*10h+bx) 
+                       ; Nhắc lại: SI, DI, BX luôn luôn đi ngầm định với DX
+\end{minted}
+
+\subsection{Lệnh \code{lea}}
+\code{LEA} là Load Effective Address.\\
+Ngoài cách ghi \code{mov REG, offset variable} ta còn có thể ghi là \code{lea REG, variable}.\\
+Vd:
+\begin{minted}[]{asm}
+mov bx, offset var1 
+lea bx, var1        ; 2 cách ghi tương đương nhau
+\end{minted}
 
 \section{Ngắt (interrupt)}
+Các interrupt giống như những ``thư viện chuẩn'' mà hệ điều hành/BIOS cung cấp cho chúng ta. \\
+Mỗi interrupt được đánh một số thứ tự nhất định (vd: \code{21h}).\\
+Bên trong các interrupt là các hàm hệ thống (syscall).\\
+Khi ta muốn gọi một hàm hệ thống nào đó, ta lưu mã số của hàm đó trong thanh ghi \code{AH}, và các thanh ghi còn lại dùng để chứa tham số của hàm đó (thanh ghi nào chứa giá trị gì thì tuỳ vào từng hàm). Cuối cùng ta gọi lệnh \code{int <mã số interrupt>}.\\
+Vd:
+\begin{minted}[]{asm}
+; In một chuỗi được trỏ tới bởi DX ra màn hình 
+; Interrupt 21h, hàm số 09h
+mov ah, 09h 
+lea dx, str 
+int 21h
+\end{minted} 
+
 
 \section{Nhập xuất dữ liệu}
+Để nhập xuất dữ liệu trong Assembly, ta không thể làm thủ công mà ta phải nhờ đến các hàm hệ thống có sẵn trong hệ điều hành hoặc BIOS. Dưới đây là một số cú pháp nhập/xuất cơ bản sử dụng API của MS-DOS (\code{int 21h}).
+
+\subsection*{Đọc một kí tự từ bàn phím}
+\begin{itemize}
+    \item Mã hàm: \code{01h}.
+    \item Tham số: không.
+    \item Trả về: \code{AL = mã ASCII của kí tự vừa đọc}. \code{AL = 0} nếu đó là kí tự điều khiển.
+\end{itemize}
+\begin{minted}[]{asm}
+mov ah, 01h 
+int 21h
+\end{minted}
+
+\subsection*{In một kí tự ra màn hình}
+\begin{itemize}
+    \item Mã hàm: \code{02h}.
+    \item Tham số: \code{DL = mã ASCII của kí tự cần hiển thị}.
+    \item Trả về: Không.
+\end{itemize}
+\begin{minted}[]{asm}
+; In kí tự '$' ra màn hình 
+mov ah, 02h 
+mov dl, '$'     ; hoặc mov dl, 24h (mã ascii của kí tự '$')
+int 21h
+\end{minted}
+
+\subsection*{Hiện chuỗi kí tự ra màn hình}
+\begin{itemize}
+    \item Mã hàm: \code{09h}.
+    \item Tham số: \code{DX = địa chỉ offset của chuỗi}.
+    \item Trả về: Không.
+    \item Lưu ý: chuỗi cần hiển thị phải kết thúc bằng dấu \code{'\$'}.
+\end{itemize}
+\begin{minted}[]{asm}
+str db "Hello world$"
+... 
+mov ah, 09h 
+mov dx, offset str   ; hoặc lea dx, str
+int 21h
+\end{minted}
+\subsection*{Đọc chuỗi kí tự từ bàn phím}
+\begin{itemize}
+    \item Mã hàm: \code{0Ah}.
+    \item Tham số: \code{DX = địa chỉ offset của chuỗi}.
+    \item Trả về: \code{[DX+1]}: số ký tự đã đọc. \code{[DX+2]}: chuỗi đã đọc được.
+    \item Lưu ý: buffer chuỗi này phải có cấu trúc như sau:
+    \begin{verbatim}
+<số ký tự tối đa đọc được>, <số ký tự đã đọc>, <phần nội dung đã đọc được>
+    \end{verbatim}
+    \par Hàm này không tự chèn dấu \code{'\$'} vào cuối chuỗi.
+\end{itemize}
+\begin{minted}[breaklines]{asm}
+str db 100, 0, 100 dup(?)
+...
+mov ah, 0ah 
+mov dx, offset str 
+int 21h
+\end{minted}
+Giải thích:
+\begin{itemize}
+    \item Cấu trúc của biến \code{str} trong khai báo(từ trái qua phải):
+    \begin{itemize}
+        \item \code{db}: mỗi phần tử của chuỗi là 1 byte (hiển nhiên).
+        \item \code{100}: báo cho hệ điều hành biết được nó có thể đọc tối đa 100 kí tự (giống như số \code 100 trong \code{getline(cin, str, 100)} trong C++).
+        \item \code{0}: số kí tự mà hệ điều hành đã đọc được. Hiện tại là \code 0. Sau khi hệ điều hành đọc xong nó sẽ gán giá trị tương ứng cho ô nhớ này.
+        \item \code{100 dup(?)}: chuỗi ``thực sự'' mà hệ điều hành sẽ lưu dữ liệu đã đọc được vào đây. Giống như khai báo \code{char str[100]};
+    \end{itemize}
+    \item Giả sử ta đã nhập vào chuỗi \code{"Dm assembly kho vcl"}. Chuỗi này gồm có 18 ký tự. Biến \code{str} sau khi nhập xong sẽ có giá trị là:
+    \begin{verbatim}
+100, 18, "Dm assembly kho vcl"
+    \end{verbatim} 
+\end{itemize}
 
 \section{Các phép toán số học và logic}
 
@@ -360,9 +612,9 @@ Vd: \codeh{1}\code{111b + } \codeh{0}\code{001b = } \codeh{0}\code{000b} (biểu
 
 \chapter{Bài tập}
 
-
-% \bibliographystyle{IEEEtran}
-% \bibliography{bib}
+\renewcommand{\bibname}{Tài liệu tham khảo}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 \end{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
