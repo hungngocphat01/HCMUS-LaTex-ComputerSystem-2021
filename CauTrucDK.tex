@@ -1,0 +1,141 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+\section{Các cấu trúc điều khiển}
+\subsection{Nhãn (label)}
+Nhãn là một khái niệm dùng để ``đánh dấu'' vị trí các dòng code. \\
+Nhãn chỉ tồn tại trong mã nguồn chương trình. Sau khi chương trình được dịch sang mã máy, các nhãn sẽ được thay thế thành các địa chỉ tương ứng của dòng code đó trong code segment.
+\begin{minted}[]{asm}
+label1:
+    mov ax, CAFEh 
+    mov bx, BEEFh 
+    add bx 
+label2:
+    mov ax, FACEh 
+    mov bx, BOOCk
+    sub bx 
+\end{minted}
+
+\subsection{So sánh \cd{CMP}}
+\begin{minted}[]{asm}
+cmp X, Y
+\end{minted}
+Lệnh \cd{CMP} dùng để so sánh 2 toán hạng \cd X, \cd Y.\\
+2 vế của \cd{CMP} phải có cùng kích thước (đều phải là byte hoặc word).\\
+Sau khi thực hiện so sánh, kết quả sẽ được lưu tạm thời vào các bit cờ hiệu:
+\begin{itemize}
+    \item \cd{X = Y: CF = 0, ZF = 1}
+    \item \cd{X > Y: CF = 0, ZF = 0}
+    \item \cd{X < Y: CF = 1, ZF = 0}
+\end{itemize}
+Vd: Cho đoạn code sau. Hỏi giá trị của các cờ \cd{CF}, \cd{ZF} sau khi thực hiện đoạn chương trình này?
+\begin{minted}[]{asm}
+mov ax, 69d
+mov bx, 96d 
+cmp ax, bx
+\end{minted}
+Trả lời: vì \cd{ax < bx} nên \cd{CF = 1, ZF = 0}.
+
+\subsection{Nhảy không điều kiện \cd{JMP}}
+Lệnh \cd{JMP} dùng để nhảy tới một nhãn mà không cần điều kiện.
+Vd: đoạn chương trình này sẽ lặp vô hạn lần, mỗi lần lặp tăng \cd{cx} lên 1.
+\begin{minted}[]{asm}
+mov cx, 0
+label_example:
+    inc cx 
+    jmp label_example
+\end{minted}
+
+\subsection{Nhảy có điều kiện \cd{J**}}
+Các lệnh \cd{J**} dùng để nhảy tới một nhãn dựa trên giá trị của các cờ hiệu (được gán từ kết quả so sánh của lệnh \cd{CMP}).\\
+Nếu điều kiện nhảy không được thoả, lệnh nhảy này sẽ bị bỏ qua.
+
+Một số lệnh trong họ \cd{J**}:\\
+\textit{(Giả sử trước khi gọi các lệnh này, ta đã gọi lệnh so sánh \mintinline{asm}{cmp X, Y})}.
+\begin{figure}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+Lệnh        &   Diễn giải           &   Điều kiện nhảy \\
+\hline 
+\cd{JE}     &   Jump equal          &   Nhảy nếu $X = Y$ \\
+\cd{JNE}    &   Jump not equal      &   Nhảy nếu $X \neq Y$ \\
+\cd{JZ}     &   Jump zero [flag]    &   Nhảy nếu \cd{ZF = 1} \\
+\cd{JNZ}    &   Jump not zero [flag] &   Nhảy nếu \cd{ZF = 0} \\
+\cd{JG}     &   Jump greater        &   Nhảy nếu $X > Y$ \\
+\cd{JL}     &   Jump lower          &   Nhảy nếu $X < Y$ \\
+\cd{JNG}    &   Jump not greater    &   Nhảy nếu $X \le Y$ \\
+\cd{JNL}    &   Jump not lower      &   Nhảy nếu $X \ge Y$ \\
+\cd{JLE}    &   Jump lower or equal & Nhảy nếu $X \le Y$ \\
+\cd{JGE}    &   Jump greater or equal & Nhảy nếu $X \ge Y$ \\
+\hline
+\end{tabular}
+\caption{Các lệnh nhảy dành cho số có dấu}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+Lệnh        &   Diễn giải           &   Điều kiện nhảy \\
+\hline 
+\cd{JE}     &   Jump equal          &   Nhảy nếu $X = Y$ \\
+\cd{JNE}    &   Jump not equal      &   Nhảy nếu $X \neq Y$ \\
+\cd{JA}     &   Jump above          &   Nhảy nếu $X > Y$ \\
+\cd{JB}     &   Jump below          &   Nhảy nếu $X < Y$ \\
+\cd{JAE}    &   Jump above or equal &   Nhảy nếu $X \ge Y$ \\
+\cd{JBE}    &   Jump below or equal &   Nhảy nếu $X \le Y$ \\
+\hline
+\end{tabular}
+\caption{Các lệnh nhảy dành cho số không dấu}
+\end{figure}
+
+
+Vd: đoạn chương trình sau sẽ in ra màn hình dòng chữ \cd{"ax > bx"} nếu \cd{ax} > \cd{bx} và \cd{"ax <= bx"} nếu ngược lại.
+\begin{minted}[breaklines]{asm}
+.data 
+    msgGreater db "ax > bx$"
+    msgSmaller db "ax <= bx$"
+.code 
+...
+mov ax, 4 
+mov bx, 9
+cmp ax, bx          ; so sánh giá trị trong 2 thanh ghi  
+jg label_greater    ; nếu ax > bx thì nhảy tới label_greater 
+                    ; nếu không, bỏ qua lệnh nhảy này  
+; vì ở trên ta đã so sánh ax > bx rồi nên nếu nó không thoả thì chỉ có thể là ax <= bx, nên ta không cần so sánh nữa (nhảy không điều kiện)
+jmp label_smaller   
+
+label_greater:
+    mov ah, 09h     ; ah = 09h: lệnh in ra màn hình 
+    lea dx, msgGreater
+    int 21h
+label_smaller:
+    mov ah, 09h
+    lea dx, msgSmaller
+    int 21h
+\end{minted}
+
+\subsection{Lặp \cd{LOOP}}
+Lệnh \cd{LOOP} dùng để lặp lại một nhãn với số lần biết trước (tương tự như \cd{for} trong các ngôn ngữ bậc cao).\\
+Số lần lặp được lưu trong thanh ghi \cd{CX}.\\
+Vd: đoạn code sau sẽ lặp lại 1 vòng lặp 5 lần, mỗi lần tăng \cd{ax} lên 7 đơn vị.
+\begin{minted}[]{asm}
+mov cx, 5
+label_test:
+    add ax, 7
+mov ax, 10
+loop label_test
+\end{minted}
+Sau khi thực hiện đoạn code trên, \cd{cx = 0} và \cd{ax = 45}.
+
+Chúng ta cũng có thể viết lại đoạn code trên bằng \cd{JNE và CMP}:
+\begin{minted}[]{asm}
+mov cx, 5
+mov ax, 10
+label_test:     ; do {
+    add ax, 7   ;   ax += 7;
+    dec cx      ;   cx--;
+    cmp cx, 0   ; } while (cx != 0)
+    jne label_test
+\end{minted}
+\end{document}

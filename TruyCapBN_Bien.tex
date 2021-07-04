@@ -1,0 +1,171 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\section{Truy cập bộ nhớ}
+\subsection{Sơ lược về truy cập bộ nhớ}
+Để truy cập vào một ô nhớ, ta có thể chứa địa chỉ offset của ô nhớ đó trong
+\begin{itemize}
+    \item Một thanh ghi con trỏ như \cd{SI, DI}.
+    \item Thanh ghi \cd{BX}.
+    \item Truy cập trực tiếp vào địa chỉ của ô nhớ đó (displacement). Có 2 loại địa chỉ là địa chỉ 8-bit (\cd{d8}) và địa chỉ 16-bit (\cd{d16}).
+\end{itemize}
+
+\textit{Lưu ý: Địa chỉ được chứa trong các thanh ghi SI, DI, BX hoặc d8, d16 là các địa chỉ offset. Địa chỉ vật lý thực sự của các ô nhớ đó thực chất là \cd{DS:SI}, \cd{DS:DI}, \cd{DS:BX}, \cd{DS:d8}, \cd{DS:d16}. Cũng cần phải lưu ý một ô nhớ có kích thước là 1 byte}.
+\bigskip
+
+Ví dụ: Giả sử hệ điều hành cấp cho ta \cd{DS = 1230h}.
+Để truy cập vào ô nhớ có địa chỉ vật lý là \cd{12345h} bằng thanh ghi \cd{SI} thì ta phải gán \cd{SI = 45h} vì \cd{DS:SI = 1230h * 10h + 45h = 12345h}.
+
+\subsection{Lệnh \cd{mov}}
+\begin{minted}{asm}
+    mov dest, src
+\end{minted}
+Lệnh \cd{mov} nhận vào 2 tham số là \cd{src} và \cd{dest} và có tác dụng gán giá trị của \cd{src} cho \cd{dest}.\\
+Mã C tương ứng: \cd{dest = src;}
+
+2 tham số của lệnh \cd{mov} có thể là:
+\begin{figure}[H]
+    \begin{minipage}{0.5\textwidth}
+\begin{verbatim}
+SYNTAX 
+
+mov REG, memory
+mov memory, REG
+mov REG, REG
+mov memory, imm
+mov REG, imm
+mov SREG, memory
+mov memory, SREG 
+mov SREG, SREG 
+mov SREG, REG
+\end{verbatim}
+    \end{minipage}
+    \hfill
+        \begin{minipage}{0.5\textwidth}
+\begin{verbatim}
+VÍ DỤ 
+
+mov AX, [0FFh]
+mov [0FFh], AX
+mov AX, BX
+mov [0CAFEh], 24h
+mov AX, 1234h
+mov ES, [0445h]
+mov [0445h], DS 
+mov ES, DS 
+mov DS, AX
+\end{verbatim}         
+         \end{minipage}
+\end{figure}
+
+Trong đó:
+\begin{itemize}
+    \item \cd{REG} là một thanh ghi đa năng như \cd{AX, BX, SI}.
+    \item \cd{memory} là một địa chỉ bộ nhớ như \cd{[0DEADh], [0BEEFh], [0CAFEh]}.
+    \item \cd{imm} là một số như \cd{1d, 2d, 0FFh, 024h, 1011b}.
+    \item \cd{SREG} là một thanh ghi đoạn như \cd{DS, ES, SS}.
+\end{itemize}
+
+Cú pháp \cd{[memory]} nghĩa là ``nội dung ô nhớ tại địa chỉ \cd{memory}''. Hay nói cách khác, đây là kí hiệu giải tham chiếu tương tự như dấu \cd{*} trong C.
+
+\section{Biến và mảng}
+\subsection{Giới thiệu về biến}
+Biến trong 8086 Asm thường được khai báo ở data segment.
+Cú pháp khai báo biến:
+\begin{minted}{asm}
+<tên biến> <kích thước> <(các) giá trị>
+\end{minted}
+
+Tên biến tuân thủ theo các quy tắc đặt tên biến đã biết trước đây.
+Kích thước có thể là:
+\begin{itemize}
+    \item \cd{db} (define byte): định nghĩa một biến có kích thước 1 byte.
+    \item \cd{dw} (define word): định nghĩa biến kích thước 2 byte.
+    \item \cd{dd} (define double [word]): định nghĩa biến có kích thước 4 byte.
+\end{itemize}
+
+Như đã nói ở phần trước, lưu ý rằng khi khai báo, các biến này sẽ nằm trong data segment. Để truy cập vào nội dung các biến này thông qua địa chỉ của chúng, các địa chỉ đó phải là địa chỉ offset được tính từ đầu data segment.
+
+Để có thể truy cập được nội dung của các biến đã khai báo trong data segment, đầu hàm main ta phải có đoạn code sau để nạp địa chỉ của data segment vào thanh ghi \cd{DS}:
+\begin{minted}[linenos]{asm}
+mov ax, @data 
+mov ds, ax
+\end{minted}
+
+Một số ví dụ về khai báo biến:
+\begin{minted}[linenos]{asm}
+.data 
+    var0 db ?           ; biến 1 byte, giá trị không biết trước
+    var1 db 2           ; biến 1 byte, giá trị là 2d
+    var2 db 24h         ; biến 1 byte, giá trị là 24h
+    var3 db '$'         ; biến 1 byte, giá trị là 24h (mã ASCII của '$')
+    var4 dw DEADh       ; biến 2 byte, giá trị là DEADh
+    var5 dd DEADBEEFh   ; biến 4 byte, giá trị là DEADBEEFh
+\end{minted}
+
+\subsection{Khai báo mảng}
+Để khai báo một mảng, ta làm như khai báo biến:
+\begin{minted}[linenos]{asm}
+.data
+    arr1 db 1, 2, 3, 4              ; mảng mà mỗi phần tử là 1 byte
+    arr2 dw DEADh, BEEFh, CAFEh     ; mảng có phần tử 2 byte
+    arr3 dd DEADBEEFh, 0DEADDADh    ; mảng có phần tử 4 byte
+\end{minted}
+3 dòng trên tương đương với 3 dòng lệnh C (về mặt \textbf{kích thước} các phần tử):
+\begin{minted}[linenos]{c}
+char arr1[] = {1, 2, 3, 4};
+short arr2[] = {0xDEAD, 0xBEEF, 0xCAFE};
+int arr3[] = {0xDEADBEEF, 0xDEADDAD};
+\end{minted}
+
+Lưu ý: mảng trong Assembly chỉ là những con trỏ và không thực sự bị giới hạn bởi kích thước khi chúng ta khai báo. Lập trình viên khi code phải tự đảm bảo rằng mình không đi vượt ra khỏi miền giá trị của mảng.
+
+Ngoài ra ta cũng có thể cấp phát (tĩnh) một mảng có kích thước cho sẵn:
+\begin{minted}[linenos]{asm}
+.data
+    arr1 db 100 dup(?)  ; mảng 100 phần tử mà mỗi pt là 1 byte, không có giá trị đầu
+    arr2 dw 100 dup(0)
+\end{minted}
+2 dòng trên tương đương với 2 dòng lệnh C (về mặt \textbf{kích thước} các phần tử):
+\begin{minted}[linenos]{c}
+char arr1[100];
+short arr2[100] = { 0 }; 
+\end{minted}
+
+Như trong C, một chuỗi cũng là một mảng, và có kích thước mỗi phần tử là 1 byte (\cd{db}).
+
+\subsection{Truy cập vào biến bằng \cd{mov}}.
+Ta có thể truy cập trực tiếp vào giá trị của biến bằng lệnh mov:
+\begin{minted}[]{asm}
+var1 db 24h
+mov ax, var1    ; ax = 24h
+\end{minted}
+Ta có thể truy cập gián tiếp thông qua địa chỉ của nó:
+\begin{minted}[]{asm}
+var1 db 24h            
+mov bx, offset var1    ; bx = địa chỉ offset var1
+mov ax, [bx]           ; ax = *(ds*10h+bx) 
+                       ; Nhắc lại: SI, DI, BX luôn luôn đi ngầm định với DX
+\end{minted}
+
+\subsection{Truy cập vào mảng}
+Ta có thể truy cập vào mảng bằng cú pháp như trong C (có một số chỗ hơi khác một tí):
+\begin{minted}[]{asm}
+arr1 db 0Ah, 0Bh, 0Ch, 0Dh, 0Eh 
+... 
+mov al, arr         ; al = 0Ah 
+mov al, arr[0]      ; al = 0Ah 
+mov al, arr[2]      ; al = 0Ch 
+mov bx, offset arr  ; bx = địa chỉ của arr
+mov al, [bx + 3]    ; al = *(bx + 3) = *(arr + 3) = arr[3]
+\end{minted}
+
+\subsection{Lệnh \cd{lea}}
+\cd{LEA} là Load Effective Address.\\
+Ngoài cách ghi \cd{mov REG, offset variable} ta còn có thể ghi là \cd{lea REG, variable}.\\
+Vd:
+\begin{minted}[]{asm}
+mov bx, offset var1 
+lea bx, var1        ; 2 cách ghi tương đương nhau
+\end{minted}
+\end{document}

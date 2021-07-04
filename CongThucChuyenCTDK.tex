@@ -1,0 +1,297 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+\section{Chuyển cấu trúc điều khiển cơ bản từ C sang Assembly}
+%--------------------------------------
+\subsection{\cd{if} đơn}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm]
+\node (start) [other_process] {...};
+\node (if) [decision,below=1cm of start] {Điều kiện};
+\node (then) [process,right=2cm of if] {Nội dung if};
+\node (stop) [startstop,right=1cm of then] {End if};
+\node [below right=0.9cm and 3cm of if] {Không thoả};
+
+\draw [arrow] (start) -- (if);
+\draw [arrow] (if) -- node[anchor=south]{Thoả} (then);
+\draw [arrow] (if.south) |- ([yshift=-2cm]stop.south) -- (stop.south);
+\draw [arrow] (then) -- (stop);
+\end{tikzpicture}
+\end{figure}
+
+\begin{minted}[]{asm}
+cmp X, Y 
+j** end_if
+    ; các lệnh nếu điều kiện thoả 
+end_if:
+\end{minted}
+Vd: Gán \cd{BX} bằng trị tuyệt đối của \cd{AX}
+\begin{figure}[H]
+\begin{minipage}{0.5\textwidth}
+\begin{minted}[]{asm}
+; Assembly
+mov ax, -9 
+mov bx, 0 
+
+cmp ax, 0   ; ax >= 0?
+jge end_inf ; nếu có, thoát ra
+
+neg ax      ; đảo dấu ax 
+end_if: 
+mov bx, ax  ; bx = ax 
+\end{minted}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+\begin{minted}[]{c}
+// Diễn giải C tương đương 
+ax = -9;
+bx = 0; 
+
+if (ax >= 0)        // cmp
+    goto end_if;    // jge
+
+ax *= -1;           // neg 
+#end_if:
+bx = ax;
+\end{minted}
+\end{minipage}
+\end{figure}
+%--------------------------------------
+\subsection{\cd{if - else}}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm]
+\node (start) [other_process] {...};
+\node (if) [decision,below=1cm of start] {if};
+\node (then) [process,right=2cm of if] {Các lệnh nếu đk thoả};
+\node (else) [process,below=2cm of then] {Các lệnh nếu đk không thoả};
+\node (stop) [startstop,right=1cm of then] {End if};
+\node [below right=0.9cm and -0.5cm of if] {Không thoả};
+
+\draw [arrow] (start) -- (if);
+\draw [arrow] (if) -- node[anchor=south]{Thoả} (then);
+\draw [arrow] (if.south) |- (else.west);
+\draw [arrow] (else.east) -- ([yshift=-2.5cm]stop.south) -- (stop.south);
+\draw [arrow] (then) -- (stop);
+\end{tikzpicture}
+\end{figure}
+    
+
+\begin{minted}[]{asm}
+cmp X, Y
+j** label_then 
+    ; các lệnh nếu đk ko thoả  
+    jmp end_if
+label_then:
+    ; các lệnh nếu điều kiện thoả 
+end_if: 
+\end{minted}
+Vd: gán \cd{CX = 0} nếu \cd{AX < BX}, \cd{CX = 1} nếu ngược lại.
+\begin{figure}[H]
+\begin{minipage}{0.6\textwidth}
+\begin{minted}[]{asm}
+; Assembly
+cmp ax, bx      ; ax < bx?
+jl label_then   ; nếu đúng, nhảy qua then 
+                ; nếu không, tiếp tục chạy
+mov cx, 1
+jmp end_if 
+
+label_then:
+    mov cx, 0
+end_if:    
+\end{minted}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\begin{minted}[]{c}
+// Diễn giải C tương đương 
+if (ax < bx)
+    goto label_then;
+cx = 1;
+goto end_if
+
+#label_then:
+    cx = 0;
+#end_if:
+\end{minted}
+\end{minipage}
+\end{figure}
+%--------------------------------------
+\subsection{\cd{if - else if - else}}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm]
+\node (start) [other_process] {...};
+\node (if1) [decision,below=1cm of start] {Điều kiện 1};
+\node (then1) [process,right=2cm of if1] {Các lệnh nếu ĐK1 thoả};
+\node (if2) [decision,below=1.5cm of if1] {Điều kiện 2};
+\node (then2) [process,right=2cm of if2] {Các lệnh nếu ĐK2 thoả};
+\node (etc) [below=1.5cm of if2,minimum height=1cm] {.......};
+\node (ifn) [decision,below=1.5cm of etc] {Điều kiện n};
+\node (thenn) [process,right=2cm of ifn] {Các lệnh nếu ĐK n thoả};
+\node (else) [process,below=1.5cm of thenn] {Các lệnh cho else};
+\node (stop) [startstop,right=2cm of else] {End if};
+
+\draw [arrow] (start) -- (if);
+\draw [arrow] (if1) -- node[anchor=south]{Thoả} (then1);
+\draw [arrow] (if2) -- node[anchor=south]{Thoả} (then2);
+\draw [arrow] (ifn) -- node[anchor=south]{Thoả} (thenn);
+
+\draw [arrow] (if1) -- node[anchor=west]{Ko thoả} (if2);
+\draw [arrow] (if2) -- node[anchor=west]{Ko thoả} (etc);
+\draw [arrow] (etc) -- node[anchor=west]{Ko thoả} (ifn);
+\draw [arrow] (ifn.south) |- node[anchor=north]{Ko thoả} (else.west);
+
+\draw [arrow] (else.east) |- (stop.west);
+\draw [arrow] (thenn.east) -- ([yshift=2cm]stop.north) -- (stop.north);
+\draw [arrow] (then1.east) -- +(3.03cm, 0) -- (stop.north);
+\draw [arrow] (then2.east) -- +(3.02cm, 0) -- (stop.north);
+
+
+\end{tikzpicture}
+\end{figure}
+\pagebreak
+
+\begin{minted}[]{asm}
+cmp X, Y
+j** label_then1
+j** label_then2
+j** label_then3
+...
+    ; các lệnh của else  
+    jmp end_if
+label_then1:
+    ; các lệnh nếu điều kiện 1 thoả 
+    jmp end_if 
+label_then2:
+    ; các lệnh nếu điều kiện 2 thoả 
+    jmp end_if 
+...
+label_thenN:
+    ; các lệnh nếu điều kiện N thoả
+end_if: 
+\end{minted}
+
+Sau mỗi \verb#label_then#, ta phải có \verb#jmp end_if# vì nếu không có nó thì label của điều kiện sau sẽ bị thực hiện (giống như vì sao ta cần \cd{break} trong cấu trúc \cd{switch - case} của C). \bigskip
+
+Vd: Nếu \cd{AX < 0} thì gán \cd{CX = -1}.\\
+Nếu \cd{AX > 0} thì gán \cd{CX = 1}.\\
+Nếu \cd{AX = 0} thì gán \cd{CX = 0}.
+\begin{figure}[H]
+\begin{minipage}{0.5\textwidth}
+\begin{minted}[]{asm}
+; Assembly
+cmp ax, 0 
+jg label_lonhon
+jl label_nhohon
+
+mov cx, 0
+jmp end_if 
+
+label_lonhon:
+    mov cx, 1
+    jmp end_if
+label_nhohon:
+    mov cx, -1
+end_if:
+\end{minted}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\begin{minted}[]{c}
+// Diễn giải C tương đương 
+if (ax > 0)
+    goto label_lonhon;
+if (ax < 0) goto label_nhohon;
+
+cx = 0;
+goto end_if;
+
+#label_lonhon:
+    cx = 1;
+    goto end_if 
+#label_nhohon:
+    cx = -1;
+#end_if:
+\end{minted}
+\end{minipage}
+\end{figure}
+%--------------------------------------
+\subsection{Lặp với số lần biết trước}
+\begin{minted}[]{asm}
+mov cx, <số lần lặp>
+label_loop:
+    ; nội dung vòng lặp 
+loop label_loop
+\end{minted}
+Vd: In chuỗi \cd{"Dm assembly kho vcl"} ra màn hình 5 lần:
+\begin{minted}[]{asm}
+.data
+    msg db "Dm assembly kho vcl", 10, 13, '$'
+.code 
+... 
+mov ah, 09h     ; hàm in chuỗi  
+lea dx, msg     ; dx = địa chỉ chuỗi 
+mov cx, 5       ; lặp 5 lần 
+label_inchuoi:
+    int 21h 
+loop label_inchuoi
+\end{minted}
+%--------------------------------------
+\subsection{Lặp với số lần chưa biết trước \cd{do-while}}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm]
+\node (start) [startstop] {Bắt đầu};
+\node (loop) [process,below of=start] {Nội dung vòng lặp};
+\node (cond) [decision,right=2cm of loop] {Kiểm tra đk};
+\node (stop) [startstop, right=3cm of cond] {Kết thúc};
+
+\draw [arrow] (start) -- (loop);
+\draw [arrow] (loop) -- (cond);
+\draw [arrow] (cond) -- node[anchor=south]{Không thoả} (stop);
+\draw [arrow] (cond) |- node[anchor=west] {Thoả} +(-8, -2.5) |- (loop.west);
+
+\end{tikzpicture}
+\end{figure}
+
+\begin{minted}[]{asm}
+label_loop:
+    ; nội dung vòng lặp 
+
+    cmp ...         ; kiểm tra điều kiện lặp 
+    j** label_loop  ; nếu điều kiện thoả, tiếp tục lặp 
+\end{minted}
+Vd: 
+
+\subsection{Lặp với số lần chưa biết trước \cd{while-do}}
+\begin{figure}[H]
+\begin{tikzpicture}[node distance=2cm]
+    \node (start) [startstop] {Bắt đầu};
+    \node (cond) [decision,below=2cm of start] {Kiểm tra đk};
+    \node (loop) [process,right=2cm of cond] {Nội dung vòng lặp};
+    \node (stop) [startstop, right= 2cm of loop] {Kết thúc};
+    \node [below right=0.8cm and -0.7 cm of cond] {Không thoả};
+
+    \draw [arrow] (start) -- (cond);
+    \draw [arrow] (cond) -- node[anchor=south] {Thoả} (loop);
+    \draw [arrow] (cond.south) |- +(10.7, -2) -- (stop.south);
+    
+    \draw [arrow] (loop.north) |- ([yshift=1cm]cond.north);
+
+\end{tikzpicture}
+\end{figure}
+
+\begin{minted}[]{asm}
+label_loop:
+    cmp ...         ; kiểm tra điều kiện lặp 
+    j** end_while   ; nếu điều kiện không thoả, thoát lặp 
+    ; nội dung vòng lặp 
+    jmp label_loop 
+end_while:
+
+\end{minted}
+
+\end{document}

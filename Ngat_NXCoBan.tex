@@ -1,0 +1,92 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+\section{Ngắt (interrupt)}
+Các interrupt giống như những ``thư viện chuẩn'' mà hệ điều hành/BIOS cung cấp cho chúng ta. \\
+Mỗi interrupt được đánh một số thứ tự nhất định (vd: \cd{21h}).\\
+Bên trong các interrupt là các hàm hệ thống (syscall).\\
+Khi ta muốn gọi một hàm hệ thống nào đó, ta lưu mã số của hàm đó trong thanh ghi \cd{AH}, và các thanh ghi còn lại dùng để chứa tham số của hàm đó (thanh ghi nào chứa giá trị gì thì tuỳ vào từng hàm). Cuối cùng ta gọi lệnh \cd{int <mã số interrupt>}.\\
+Vd:
+\begin{minted}[]{asm}
+; In một chuỗi được trỏ tới bởi DX ra màn hình 
+; Interrupt 21h, hàm số 09h
+mov ah, 09h 
+lea dx, str 
+int 21h
+\end{minted} 
+Danh sách các interrupt phổ biến: \href{https://jbwyatt.com/253/emu/8086_bios_and_dos_interrupts.html}{\cd{8086 BIOS and DOS interrupts}}.
+
+\section{Nhập xuất dữ liệu}
+Để nhập xuất dữ liệu trong Assembly, ta không thể làm thủ công mà ta phải nhờ đến các hàm hệ thống có sẵn trong hệ điều hành hoặc BIOS. Dưới đây là một số cú pháp nhập/xuất cơ bản sử dụng API của MS-DOS (\cd{int 21h}).
+
+\subsection{Đọc một kí tự từ bàn phím}
+\begin{itemize}
+    \item Mã hàm: \cd{01h}.
+    \item Tham số: không.
+    \item Trả về: \cd{AL = mã ASCII của kí tự vừa đọc}. \cd{AL = 0} nếu đó là kí tự điều khiển.
+\end{itemize}
+\begin{minted}[]{asm}
+mov ah, 01h 
+int 21h
+\end{minted}
+
+\subsection{In một kí tự ra màn hình}
+\begin{itemize}
+    \item Mã hàm: \cd{02h}.
+    \item Tham số: \cd{DL = mã ASCII của kí tự cần hiển thị}.
+    \item Trả về: Không.
+\end{itemize}
+\begin{minted}[]{asm}
+; In kí tự '$' ra màn hình 
+mov ah, 02h 
+mov dl, '$'     ; hoặc mov dl, 24h (mã ascii của kí tự '$')
+int 21h
+\end{minted}
+
+\subsection{Hiện chuỗi kí tự ra màn hình}
+\begin{itemize}
+    \item Mã hàm: \cd{09h}.
+    \item Tham số: \cd{DX = địa chỉ offset của chuỗi}.
+    \item Trả về: Không.
+    \item Lưu ý: chuỗi cần hiển thị phải kết thúc bằng dấu \cd{'\$'}.
+\end{itemize}
+\begin{minted}[]{asm}
+str db "Hello world$"
+... 
+mov ah, 09h 
+mov dx, offset str   ; hoặc lea dx, str
+int 21h
+\end{minted}
+\subsection{Đọc chuỗi kí tự từ bàn phím}
+\begin{itemize}
+    \item Mã hàm: \cd{0Ah}.
+    \item Tham số: \cd{DX = địa chỉ offset của chuỗi}.
+    \item Trả về: \cd{[DX+1]}: số ký tự đã đọc. \cd{[DX+2]}: chuỗi đã đọc được.
+    \item Lưu ý: buffer chuỗi này phải có cấu trúc như sau:
+    \begin{verbatim}
+<số ký tự tối đa đọc được>, <số ký tự đã đọc>, <phần nội dung đã đọc được>
+    \end{verbatim}
+    \par Hàm này không tự chèn dấu \cd{'\$'} vào cuối chuỗi.
+\end{itemize}
+\begin{minted}[breaklines]{asm}
+str db 100, 0, 100 dup(?)
+...
+mov ah, 0ah 
+mov dx, offset str 
+int 21h
+\end{minted}
+Giải thích:
+\begin{itemize}
+    \item Cấu trúc của biến \cd{str} trong khai báo(từ trái qua phải):
+    \begin{itemize}
+        \item \cd{db}: mỗi phần tử của chuỗi là 1 byte (hiển nhiên).
+        \item \cd{100}: báo cho hệ điều hành biết được nó có thể đọc tối đa 100 kí tự (giống như số \cd 100 trong \cd{getline(cin, str, 100)} trong C++).
+        \item \cd{0}: số kí tự mà hệ điều hành đã đọc được. Hiện tại là \cd 0. Sau khi hệ điều hành đọc xong nó sẽ gán giá trị tương ứng cho ô nhớ này.
+        \item \cd{100 dup(?)}: chuỗi ``thực sự'' mà hệ điều hành sẽ lưu dữ liệu đã đọc được vào đây. Giống như khai báo \cd{char str[100]};
+    \end{itemize}
+    \item Giả sử ta đã nhập vào chuỗi \cd{"Dm assembly kho vcl"}. Chuỗi này gồm có 18 ký tự. Biến \cd{str} sau khi nhập xong sẽ có giá trị là:
+    \begin{verbatim}
+100, 18, "Dm assembly kho vcl" <các giá trị rác>
+    \end{verbatim} 
+    \par Sau chuỗi này là giá trị rác, vì khi khai báo ta đã khai báo một chuỗi có 100 phần tử, nhưng chuỗi đọc được chỉ có 18 phần tử mà thôi. Do đó, 82 phần tử còn lại sẽ là giá trị rác.
+\end{itemize}
+\end{document}
