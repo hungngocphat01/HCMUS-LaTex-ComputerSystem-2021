@@ -26,7 +26,11 @@ main proc
 _ifChuHoa:
     cmp bl, 'Z'         ; BL <= 'Z'?
     jg _cmpChuThuong    ; S -> bỏ qua, kiểm tra BL >= 'a'?
+<<<<<<< HEAD
     lea dx, msgKyTuHoa  ; Đ -> BL là chữ hoa
+=======
+    lea dx, msgKyTuHoa  
+>>>>>>> 2fa1882184c95ab05c5016dbda81309218ffa74f
     mov ah, 09h
     int 21h             
     jmp _endif       
@@ -43,7 +47,11 @@ _ifChuThuong:
     jmp _endif  
 _cmpKySo:
     cmp bl, '1'         ; BL >= '1'?
+<<<<<<< HEAD
     jge _ifKySo         ; Đ -> kiểm tra BL <= '9'?
+=======
+    jge _ifKySo         ; Đ -> kiểm tra BL <= 'z'?
+>>>>>>> 2fa1882184c95ab05c5016dbda81309218ffa74f
     jmp _else           ; S -> bỏ qua, nhảy đến trg.hợp else
 _ifKySo:
     cmp bl, '9'         ; BL <= '9'?
