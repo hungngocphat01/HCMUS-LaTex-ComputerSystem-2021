@@ -1,0 +1,101 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+\subsection{Đề bài}
+\paragraph{Bài 1} Viết chương trình nhập vào một kí tự. Hãy in ra kí tự liền trước và liền sau của nó.
+\paragraph{Bài 2} Viết chương trình nhập vào một chuỗi kí tự. Chuyển các kí tự đó sang chữ hoa và in lại nó ra màn hình.
+\paragraph{Bài 3} Viết chương trình nhập vào một kí tự. Hãy cho biết nó là chữ hoa, chữ thường hay ký số?
+\paragraph{Bài 4} Viết thủ tục in một số thập phân không dấu ra màn hình. Tham số truyền vào từ stack.
+\paragraph{Bài 5} Viết chương trình nhập vào 2 số nguyên dương có 1 chữ số. Tính tổng của chúng và in ra màn hình.
+\paragraph{Bài 6} Viết chương trình nhập vào một số nguyên dương và in ra màn hình tổng các chữ số của số đó.
+\paragraph{Bài 7*} Viết thủ tục chuyển một chuỗi kí tự biểu diễn số nguyên dương thập phân (như \cd{"1234"}) sang giá trị thập phân tương ứng của chúng. Tham số và giá trị trả về của hàm được lưu vào stack.
+\pagebreak
+
+\subsection{Đáp án và giải thích}
+Các bạn có thể chép code của các bài này để chạy thử trên Github: \href{https://github.com/hungngocphat01/LaTex-ComputerSystem-2021}{hungngocphat01/LaTex-ComputerSystem-2021} (code nằm trong thư mục \cd{answer\_source}).\\
+Code đã được test trên emu8086.
+\renewcommand{\fcolorbox}[4][]{#4}
+%--------------------------------------------------
+\paragraph*{Bài 1}
+Chỉ cần nhớ rằng:
+\begin{itemize}
+    \item Với các hàm hệ thống của MS-DOS, khi bạn nhập một kí tự từ bàn phím vào, nó sẽ được lưu dưới dạng một số nguyên là mã ASCII của kí tự đó.\\
+        Vd: khi bạn nhập chữ \cd{'a'}, giá trị được lưu lại là số \cd{97}.
+    \item Khi bạn xuất một số nguyên ra màn hình, dữ liệu được xuất không phải là số nguyên đó mà là kí tự tương ứng với mã ASCII biểu diễn bởi số nguyên đó.\\
+        Vd: khi bạn ``xuất số'' \cd{97}, chương trình sẽ xuất chữ \cd{'a'} ra màn hình.
+    \item Kí tự liền liền sau và liền trước của một kí tự có mã ASCII hơn/kém kí tự đó 1 đơn vị.
+\end{itemize}
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai1.asm}
+%--------------------------------------------------
+\paragraph*{Bài 3}
+Bài này khá dài, mang tính tham khảo vì đi thi mà code giấy nguyên cả cái này chắc gãy tay quá \verb#:v#.\\
+Cần nhớ lại các khái niệm về nhãn, lệnh nhảy không điều kiện, lệnh nhảy có điều kiện.\\
+Cần lưu ý lệnh so sánh trong Assembly không thể \verb#&&# được như \cd{if} trong C nên ta phải viết kiểu như sau:
+\begin{minted}[]{cpp}
+if (A && B) {
+    ...
+}
+// Chuyển thành
+if (A) {
+    if (B) {
+        ...
+    }
+}
+\end{minted}
+Cụ thể, thuật toán so sánh cho bài này là: (trang sau)
+
+\begin{figure}[H]
+\newcommand{\textD}{\textcolor{OliveGreen}{\cd{Đ}}}
+\newcommand{\textS}{\textcolor{red}{\cd{S}}}
+
+\centering
+\tikzset{node distance = 4.5cm and 4.5cm}
+
+\begin{tikzpicture}
+
+\coordinate (in) {};
+\node[io,text width=3cm] (input) {Nhập kí tự, lưu vào \cd{BL}};
+% Các khối if
+\node[decision,below of=input] (capitalA) {\cd{BL >= 'A'?}};
+\node[decision,right of=capitalA] (capitalZ) {\cd{BL <= 'Z'?}};
+\node[decision,below of=capitalA] (lowerA) {\cd{BL >= 'a'?}};
+\node[decision,right of=lowerA] (lowerZ) {\cd{BL <= 'z'?}};
+\node[decision,below of=lowerA] (number1) {\cd{BL >= '1'?}};
+\node[decision,right of=number1] (number9) {\cd{BL <= '9'?}};
+% Các khối kết quả 
+\node[io,right of=capitalZ,text width=2cm] (resultCapital) {\cd{BL} là chữ hoa};
+\node[io,right of=lowerZ,text width=2cm] (resultLower) {\cd{BL} là chữ thường};
+\node[io,right of=number9,text width=2cm] (resultDigit) {\cd{BL} là ký số};
+\node[io,below=3cm of resultDigit,text width=3cm] (else) {Các trường hợp khác (\cd{else})};
+% Khối out 
+\node[startstop, right=2cm of else] (end) {End if};
+
+% Mũi tên cho khối if
+\draw[arrow] (input) -- (capitalA);
+\draw[arrow] (capitalA) -- node[anchor=south]{\textD} (capitalZ);
+\draw[arrow] (lowerA) -- node[anchor=south]{\textD} (lowerZ);
+\draw[arrow] (capitalA) -- node[anchor=east]{\textS} coordinate[midway] (midAa) (lowerA);
+\draw[arrow] (number1) -- node[anchor=south]{\textD} (number9);
+\draw[arrow] (lowerA) -- node[anchor=east]{\textS} coordinate[midway] (mida1) (number1);
+\draw[arrow] (number1) |- node[anchor=east,near start] {\textS} coordinate[midway] (mid1e) (else);
+% Mũi tên cho khối kết quả 
+\draw[arrow] (capitalZ) -- node[anchor=south]{\textD} (resultCapital);
+\draw[arrow] (lowerZ) -- node[anchor=south]{\textD} (resultLower);
+\draw[arrow] (number9) -- node[anchor=south]{\textD} (resultDigit);
+
+\draw[arrow] (capitalZ) |- node[anchor=south west]{\textS} (midAa);
+\draw[arrow] (lowerZ) |- node[anchor=south west]{\textS} (mida1);
+\draw[arrow] (number9) |- node[anchor=south west,near start]{\textS} (else);
+
+\draw[arrow] (else) -- (end);
+\draw[arrow] (resultCapital) -| (end);
+\draw[arrow] (resultDigit) -| (end);
+\draw[arrow] (resultLower) -| (end);
+
+\end{tikzpicture}
+\end{figure}
+\pagebreak
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai3.asm}
+
+\end{document}

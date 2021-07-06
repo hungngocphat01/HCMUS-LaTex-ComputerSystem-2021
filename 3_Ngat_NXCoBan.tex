@@ -13,6 +13,7 @@ mov ah, 09h
 lea dx, str 
 int 21h
 \end{minted} 
+\textit{Khi gọi các hàm được lưu trong interrupt, giá trị của các thanh ghi có thể sẽ bị thay đổi!!}
 Danh sách các interrupt phổ biến: \href{https://jbwyatt.com/253/emu/8086_bios_and_dos_interrupts.html}{\cd{8086 BIOS and DOS interrupts}}.
 
 \section{Nhập xuất dữ liệu}
@@ -89,4 +90,14 @@ Giải thích:
     \end{verbatim} 
     \par Sau chuỗi này là giá trị rác, vì khi khai báo ta đã khai báo một chuỗi có 100 phần tử, nhưng chuỗi đọc được chỉ có 18 phần tử mà thôi. Do đó, 82 phần tử còn lại sẽ là giá trị rác.
 \end{itemize}
+
+\subsection*{Trở về DOS}
+Sau khi chương trình kết thúc, nó sẽ không tự thoát ra như trong các ngôn ngữ lập trình/hệ điều hành khác. Ta phải tự tay thoát chương trình bằng hàm số \cd{4ch} thuộc interrupt \cd{21h}.
+\begin{minted}[]{asm}
+mov ah, 4ch
+int 21h
+\end{minted}
+
+Các ngắt chuẩn của MS-DOS cũng như BIOS của các máy IBM PC chạy vi xử lý 8086 không có các hàm đọc hay in giá trị số. Chúng chỉ có thể đọc và in kí tự hoặc chuỗi kí tự. Lập trình viên phải tự viết các hàm phục vụ những điều này.
+
 \end{document}
