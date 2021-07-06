@@ -1,0 +1,63 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\section{Stack}
+Stack là một vùng nhớ nằm trên RAM, được xác định bởi địa chỉ chứa trong thanh ghi SS.\\
+Đỉnh của stack được xác định bởi địa chỉ được lưu trong thanh ghi \cd{SP} là \cd{SS:[SP]}.\\
+Stack trong CPU 8086 được lưu theo theo chiều ``ngược'', nghĩa là khi ta push vào thì thanh ghi SP sẽ ``đi xuống''.\\
+Trong các ngôn ngữ bậc cao, stack segment được sử dụng để chứa các biến cục bộ và tham số của các thủ tục khi được gọi.\bigskip
+
+Để đẩy một phần tử vào stack, ta dùng lệnh \cd{PUSH}, để lấy một phần tử từ stack ra, ta dùng lệnh \cd{POP}. 2 lệnh này chỉ hoạt động với toán hạng có giá trị 2 byte (16 bit).\\
+Cú pháp:
+\begin{verbatim}
+push/pop SREG 
+push/pop REG 
+push/pop memory 
+\end{verbatim}
+
+Ví dụ: swap giá trị của 2 thanh ghi 
+\begin{minted}[]{asm}
+mov ax, 1234h
+mov bx, 0abch
+
+push ax         ; stack <- 1234h 
+mov ax, bx      ; ax = 0abch
+pop bx          ; stack -> bx 
+                ; bx = 1234h
+\end{minted}
+
+\section{Thủ tục}
+Khái niệm thủ tục trong Assembly giống với khái niệm hàm (void) trong C.\\
+Cách khai báo một thủ tục:
+\begin{minted}[]{asm}
+<tên thủ tục> proc 
+    <nội dung thủ tục>
+endp
+\end{minted}
+
+Vd: khai báo thủ tục hoán đổi 2 thanh ghi \cd{ax} và \cd{bx}
+\begin{minted}[]{asm}
+swapAXBX proc 
+    push ax 
+    mov ax, bx
+    pop bx
+endp
+\end{minted}
+
+Để gọi một thủ tục, ta sử dụng lệnh \cd{CALL}.
+\begin{minted}[]{asm}
+mov ax, 1234h
+mov bx, 0abch
+call swapAXBX 
+\end{minted}
+
+Cách một thủ tục được ``gọi'': sử dụng call stack.
+\begin{itemize}
+    \item Địa chỉ của thanh ghi \cd{IP} được cất vào stack. (IP là thanh ghi trỏ đến lệnh đang được thực thi).
+    \item \cd{IP} sẽ trỏ đến lệnh đầu tiên thủ tục và bắt đầu thực thi các lệnh trong thủ tục.
+    \item Sau khi thủ tục được thực thi xong, giá trị của thanh ghi \cd{IP} sẽ được pop ra từ stack để chương trình tiếp tục thực thi tại nơi mà nó đã rời đi trước đó.
+\end{itemize}
+Đây cũng là cách mà ``callstack'' hoạt động trong các ngôn ngữ bậc cao như C.\\
+Vì lý do trên, \textbf{ta tuyệt đối không được hàm hỏng stack} vì sau khi gọi hàm, chương trình sẽ bị trở về sai vị trí.
+
+\end{document}

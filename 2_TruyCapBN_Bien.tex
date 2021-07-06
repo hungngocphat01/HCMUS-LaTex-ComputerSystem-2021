@@ -46,12 +46,12 @@ mov SREG, REG
 VÍ DỤ 
 
 mov AX, [0FFh]
-mov [0FFh], AX
+mov [BX], AX
 mov AX, BX
 mov [0CAFEh], 24h
 mov AX, 1234h
 mov ES, [0445h]
-mov [0445h], DS 
+mov [DX], DS 
 mov ES, DS 
 mov DS, AX
 \end{verbatim}         
@@ -61,12 +61,17 @@ mov DS, AX
 Trong đó:
 \begin{itemize}
     \item \cd{REG} là một thanh ghi đa năng như \cd{AX, BX, SI}.
-    \item \cd{memory} là một địa chỉ bộ nhớ như \cd{[0DEADh], [0BEEFh], [0CAFEh]}.
+    \item \cd{memory} là một địa chỉ bộ nhớ như \cd{[0DEADh], [0BEEFh], [0CAFEh], [BX], [DX]}.
     \item \cd{imm} là một số như \cd{1d, 2d, 0FFh, 024h, 1011b}.
     \item \cd{SREG} là một thanh ghi đoạn như \cd{DS, ES, SS}.
 \end{itemize}
 
 Cú pháp \cd{[memory]} nghĩa là ``nội dung ô nhớ tại địa chỉ \cd{memory}''. Hay nói cách khác, đây là kí hiệu giải tham chiếu tương tự như dấu \cd{*} trong C.
+
+\textbf{Lưu ý:} 2 vế của lệnh \cd{MOV} phải có kích thước bằng nhau. Ví dụ như lệnh sau đây là không hợp lệ vì \cd{AL} và \cd{BX} có kích thước khác nhau.
+\begin{minted}[]{asm}
+mov BX, AL
+\end{minted}
 
 \section{Biến và mảng}
 \subsection{Giới thiệu về biến}

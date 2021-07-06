@@ -14,7 +14,7 @@
 
 \draw [arrow] (start) -- (if);
 \draw [arrow] (if) -- node[anchor=south]{Thoả} (then);
-\draw [arrow] (if.south) |- ([yshift=-2cm]stop.south) -- (stop.south);
+\draw [arrow] (if.south) -- ++(0,-1) -| (stop);
 \draw [arrow] (then) -- (stop);
 \end{tikzpicture}
 \end{figure}
@@ -61,20 +61,20 @@ bx = ax;
 \subsection{\cd{if - else}}
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[node distance=2cm]
-\node (start) [other_process] {...};
-\node (if) [decision,below=1cm of start] {if};
-\node (then) [process,right=2cm of if] {Các lệnh nếu đk thoả};
-\node (else) [process,below=2cm of then] {Các lệnh nếu đk không thoả};
-\node (stop) [startstop,right=1cm of then] {End if};
-\node [below right=0.9cm and -0.5cm of if] {Không thoả};
+    \begin{tikzpicture}[node distance=2cm]
+    \node (start) [other_process] {...};
+    \node (if) [decision,below=1cm of start] {if};
+    \node (then) [process,right=2cm of if] {Các lệnh nếu đk thoả};
+    \node (else) [process,below=2cm of then] {Các lệnh nếu đk không thoả};
+    \node (stop) [startstop,right=1cm of then] {End if};
+    \node [below right=0.9cm and -0.5cm of if] {Không thoả};
 
-\draw [arrow] (start) -- (if);
-\draw [arrow] (if) -- node[anchor=south]{Thoả} (then);
-\draw [arrow] (if.south) |- (else.west);
-\draw [arrow] (else.east) -- ([yshift=-2.5cm]stop.south) -- (stop.south);
-\draw [arrow] (then) -- (stop);
-\end{tikzpicture}
+    \draw [arrow] (start) -- (if);
+    \draw [arrow] (if) -- node[anchor=south]{Thoả} (then);
+    \draw [arrow] (if.south) |- (else.west);
+    \draw [arrow] (else.east) -| (stop.south);
+    \draw [arrow] (then) -- (stop);
+    \end{tikzpicture}
 \end{figure}
     
 
@@ -145,9 +145,9 @@ goto end_if
 \draw [arrow] (ifn.south) |- node[anchor=north]{Ko thoả} (else.west);
 
 \draw [arrow] (else.east) |- (stop.west);
-\draw [arrow] (thenn.east) -- ([yshift=2cm]stop.north) -- (stop.north);
-\draw [arrow] (then1.east) -- +(3.03cm, 0) -- (stop.north);
-\draw [arrow] (then2.east) -- +(3.02cm, 0) -- (stop.north);
+\draw [arrow] (thenn.east) -| (stop.north);
+\draw [arrow] (then1.east) -| (stop.north);
+\draw [arrow] (then2.east) -| (stop.north);
 
 
 \end{tikzpicture}
@@ -155,9 +155,11 @@ goto end_if
 \pagebreak
 
 \begin{minted}[]{asm}
-cmp X, Y
-j** label_then1
+cmp X2, Y2          ; Dieu kien 1
+j** label_then1 
+cmp X2, Y2          ; Dieu kien 2
 j** label_then2
+cmp X3, Y3          ; Dieu kien 3
 j** label_then3
 ...
     ; các lệnh của else  
@@ -252,7 +254,7 @@ loop label_inchuoi
 \draw [arrow] (start) -- (loop);
 \draw [arrow] (loop) -- (cond);
 \draw [arrow] (cond) -- node[anchor=south]{Không thoả} (stop);
-\draw [arrow] (cond) |- node[anchor=west] {Thoả} +(-8, -2.5) |- (loop.west);
+\draw [arrow] (cond.south) |- node[anchor=north east] {Thoả} (0,-4) -|  (loop.south);
 
 \end{tikzpicture}
 \end{figure}
@@ -272,12 +274,12 @@ Vd:
     \node (start) [startstop] {Bắt đầu};
     \node (cond) [decision,below=2cm of start] {Kiểm tra đk};
     \node (loop) [process,right=2cm of cond] {Nội dung vòng lặp};
-    \node (stop) [startstop, right= 2cm of loop] {Kết thúc};
+    \node (stop) [startstop, below= 1.5cm of cond] {Kết thúc};
     \node [below right=0.8cm and -0.7 cm of cond] {Không thoả};
 
     \draw [arrow] (start) -- (cond);
     \draw [arrow] (cond) -- node[anchor=south] {Thoả} (loop);
-    \draw [arrow] (cond.south) |- +(10.7, -2) -- (stop.south);
+    \draw [arrow] (cond.south) -- (stop);
     
     \draw [arrow] (loop.north) |- ([yshift=1cm]cond.north);
 
