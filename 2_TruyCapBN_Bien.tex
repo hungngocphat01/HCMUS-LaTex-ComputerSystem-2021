@@ -61,12 +61,26 @@ mov DS, AX
 Trong đó:
 \begin{itemize}
     \item \cd{REG} là một thanh ghi đa năng như \cd{AX, BX, SI}.
-    \item \cd{memory} là một địa chỉ bộ nhớ như \cd{[0DEADh], [0BEEFh], [0CAFEh], [BX], [DX]}.
+    \item \cd{memory} là một nội dung tại địa chỉ bộ nhớ, có dạng \cd{[address]}.\\Vd: \cd{[0DEADh], [0BEEFh], [0CAFEh], [BX], [DX]}.
     \item \cd{imm} là một số như \cd{1d, 2d, 0FFh, 024h, 1011b}.
     \item \cd{SREG} là một thanh ghi đoạn như \cd{DS, ES, SS}.
 \end{itemize}
 
-Cú pháp \cd{[memory]} nghĩa là ``nội dung ô nhớ tại địa chỉ \cd{memory}''. Hay nói cách khác, đây là kí hiệu giải tham chiếu tương tự như dấu \cd{*} trong C.
+Cú pháp \cd{[adress]} nghĩa là ``nội dung ô nhớ tại địa chỉ \cd{memory}''. Hay nói cách khác, đây là kí hiệu giải tham chiếu tương tự như dấu \cd{*} trong C.\\
+Ta nên ``ép kiểu'' con trỏ về một kích thước nhất định khi thao tác với các toán hạng dạng \cd{[address]}.
+\begin{itemize}
+    \item \mintinline{nasm}{byte ptr[address]}: con trỏ trỏ đến vùng nhớ có kích thước 1 byte.
+    \item \mintinline{nasm}{word ptr[address]}: con trỏ trỏ đến vùng nhớ có kích thước 2 byte.
+\end{itemize}
+Vd: gán kí tự đầu tiên của một chuỗi nào đó thành kí tự \cd{'a'}.
+\begin{minted}[]{nasm}
+... 
+lea dx, string         
+; Thay vì viết
+mov [dx], 'a'
+; Ta nên viết 
+mov byte ptr [dx], 'a'  ; (chuỗi kí tự có các phần tử là 1 byte)     
+\end{minted}
 
 \textbf{Lưu ý:} 2 vế của lệnh \cd{MOV} phải có kích thước bằng nhau. Ví dụ như lệnh sau đây là không hợp lệ vì \cd{AL} và \cd{BX} có kích thước khác nhau.
 \begin{minted}[]{asm}

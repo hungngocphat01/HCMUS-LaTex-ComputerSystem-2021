@@ -1,16 +1,20 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
-\subsection{Đề bài}
+\newcommand{\textD}{\textcolor{OliveGreen}{\cd{Đ}}}
+\newcommand{\textS}{\textcolor{red}{\cd{S}}}
+
+\section{Đề bài}
+\textit{Bài dưới có thể sử dụng lại các thủ tục viết ở bài trên.}
 \paragraph{Bài 1} Viết chương trình nhập vào một kí tự. Hãy in ra kí tự liền trước và liền sau của nó.
 \paragraph{Bài 2} Viết chương trình nhập vào một chuỗi kí tự. Chuyển các kí tự đó sang chữ hoa và in lại nó ra màn hình.
 \paragraph{Bài 3} Viết chương trình nhập vào một kí tự. Hãy cho biết nó là chữ hoa, chữ thường hay ký số?
 \paragraph{Bài 4} Viết thủ tục in một số thập phân không dấu ra màn hình. Tham số truyền vào từ stack.
+\paragraph{Bài 5} Viết thủ tục tính $x^n$ với $0\le x, n \le 9$.
 \paragraph{Bài 5} Viết chương trình nhập vào 2 số nguyên dương có 1 chữ số. Tính tổng của chúng và in ra màn hình.
 \paragraph{Bài 6} Viết chương trình nhập vào một số nguyên dương và in ra màn hình tổng các chữ số của số đó.
-\paragraph{Bài 7*} Viết thủ tục chuyển một chuỗi kí tự biểu diễn số nguyên dương thập phân (như \cd{"1234"}) sang giá trị thập phân tương ứng của chúng. Tham số và giá trị trả về của hàm được lưu vào stack.
 \pagebreak
 
-\subsection{Đáp án và giải thích}
+\section{Đáp án và giải thích}
 Các bạn có thể chép code của các bài này để chạy thử trên Github: \href{https://github.com/hungngocphat01/LaTex-ComputerSystem-2021}{hungngocphat01/LaTex-ComputerSystem-2021} (code nằm trong thư mục \cd{answer\_source}).\\
 Code đã được test trên emu8086.
 \renewcommand{\fcolorbox}[4][]{#4}
@@ -26,6 +30,52 @@ Chỉ cần nhớ rằng:
 \end{itemize}
 
 \inputminted[linenos,breaklines]{nasm}{answer_source/Bai1.asm}
+%--------------------------------------------------
+\paragraph*{Bài 2}
+Tóm tắt các kiến thức cần sử dụng: 
+\begin{itemize}
+    \item Cách nhập xuất chuỗi kí tự.
+    \item Cấu trúc của buffer chuỗi kí tự khi nhập chuỗi bằng hàm \cd{int 21h, ah = 0ah} trong Assembly 8086.
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[mybox/.style={minimum width=3cm,draw,thick,align=center,minimum height=1.5cm}]
+            \node[mybox,text width=3cm] (a) {\cd{Số lượng ký tự tối đa}};
+            \node[right=-1pt of a, mybox,text width=3cm] (b) {\cd{Số lượng ký tự HĐH đọc được}};
+            \node[right=-1pt of b, mybox,minimum width] (c) {\cd{Nội dung thực sự của chuỗi}};
+
+            \node[left=0.5cm of a] {\cd{Biến chuỗi}};
+            \node[below= 5pt of a] {\cd{Byte số 0}};
+            \node[below= 5pt of b] {\cd{Byte số 1}};
+            \node[below= 5pt of c] {\cd{Byte số 3 trở đi}};
+        \end{tikzpicture}
+    \end{figure}
+        Chính vì vậy, sau khi đọc chuỗi xong (địa chỉ chuỗi lưu trong thanh ghi \cd{dx}), nội dung thực sự của chuỗi sẽ bắt đầu từ vị trí \cd{dx[2]} (hay \cd{*(dx + 2)}) trở đi.
+    \item Thuật toán để biến một chuỗi \cd{str} từ in thường thành chuỗi in hoa. Trong thuật toán này mình sẽ dùng \cd{si} làm thanh ghi con trỏ và \cd{cx} làm ``biến'' chứa kích thước chuỗi.
+    \begin{figure}[H]
+        \begin{tikzpicture}[node distance=2cm and 2cm]
+            \node[process] (assign) {\cd{si := địa chỉ(str) + 2}};
+            \node[decision,below=of assign] (checkA) {\cd{*si >= 'a'?}};
+            \node[decision,right=of checkA] (checkZ) {\cd{*si <= 'z'?}};
+            \node[process,right=of checkZ] (capitalize) {\cd{*si := *si - 32}};
+            \node[process,below=of checkA] (nextchar) {\verb#cx++; si--#};
+            \node[decision,below=of nextchar] (while) {\cd{cx = 0?}};             
+            \node[startstop,right=of while] (stop) {Kết thúc};
+
+            \draw[arrow] (assign) -- coordinate[midway] (begin) (checkA);
+            \draw[arrow] (checkA) -- node[anchor=south]{\textD} (checkZ);
+            \draw[arrow] (checkA) -- coordinate[midway] (anext) node[anchor=east]{\textS} (nextchar);
+            \draw[arrow] (nextchar) -- (while);
+            \draw[arrow] (while) -- node[anchor=south]{\textD} (stop);
+            \draw[arrow] (while.west) -- node[anchor=north,near start]{\textS} +(-2,0) |- (begin.west); 
+            \draw[arrow] (checkZ) -- node[anchor=south]{\textD} (capitalize);
+            \draw[arrow] (checkZ) |- node[anchor=west]{\textS} (anext);
+        \end{tikzpicture}
+    \end{figure}
+\end{itemize}
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai2.asm}
+
+
 %--------------------------------------------------
 \paragraph*{Bài 3}
 Bài này khá dài, mang tính tham khảo vì đi thi mà code giấy nguyên cả cái này chắc gãy tay quá \verb#:v#.\\
@@ -45,9 +95,6 @@ if (A) {
 Cụ thể, thuật toán so sánh cho bài này là: (trang sau)
 
 \begin{figure}[H]
-\newcommand{\textD}{\textcolor{OliveGreen}{\cd{Đ}}}
-\newcommand{\textS}{\textcolor{red}{\cd{S}}}
-
 \centering
 \tikzset{node distance = 4.5cm and 4.5cm}
 
