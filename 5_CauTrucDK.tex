@@ -1,7 +1,7 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
-\section{Các cấu trúc điều khiển}
-\subsection{Nhãn (label)}
+\section{Các cấu trúc điều khiển} \label{sec:cautrucdieukhien}
+\subsection{Nhãn (label)} \label{subsec:label}
 Nhãn là một khái niệm dùng để ``đánh dấu'' vị trí các dòng code. \\
 Nhãn chỉ tồn tại trong mã nguồn chương trình. Sau khi chương trình được dịch sang mã máy, các nhãn sẽ được thay thế thành các địa chỉ tương ứng của dòng code đó trong code segment.
 \begin{minted}[]{asm}
@@ -15,7 +15,7 @@ label2:
     sub bx 
 \end{minted}
 
-\subsection{So sánh \cd{CMP}}
+\subsection{So sánh \cd{CMP}} 
 \begin{minted}[]{asm}
 cmp X, Y
 \end{minted}
@@ -35,7 +35,7 @@ cmp ax, bx
 \end{minted}
 Trả lời: vì \cd{ax < bx} nên \cd{CF = 1, ZF = 0}.
 
-\subsection{Nhảy không điều kiện \cd{JMP}}
+\subsection{Nhảy không điều kiện \cd{JMP}} \label{subsec:jmp}
 Lệnh \cd{JMP} dùng để nhảy tới một nhãn mà không cần điều kiện.
 Vd: đoạn chương trình này sẽ lặp vô hạn lần, mỗi lần lặp tăng \cd{cx} lên 1.
 \begin{minted}[]{asm}
@@ -45,7 +45,7 @@ label_example:
     jmp label_example
 \end{minted}
 
-\subsection{Nhảy có điều kiện \cd{J**}}
+\subsection{Nhảy có điều kiện \cd{J**}} \label{subsec:jxx}
 Các lệnh \cd{J**} dùng để nhảy tới một nhãn dựa trên giá trị của các cờ hiệu (được gán từ kết quả so sánh của lệnh \cd{CMP}).\\
 Nếu điều kiện nhảy không được thoả, lệnh nhảy này sẽ bị bỏ qua.
 

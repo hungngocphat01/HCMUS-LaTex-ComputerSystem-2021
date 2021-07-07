@@ -1,0 +1,14 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\section{Thư viện \cd{emu8086} (tham khảo)} \label{sec:emu8086}
+Đây là thư viện được đi kèm với trình giả lập \cd{emu8086} để chúng ta có thể code một cách thuận tiện hơn.\\
+Vì các interrupt chuẩn của MS-DOS và BIOS của máy IBM PC chạy CPU 8086 không hỗ trợ sẵn các hàm nhập/xuất giá trị số nên việc code ra những thứ liên quan tới các hàm này rất khó khăn. \\
+Thư viện này đi kèm với trình giả lập emu8086. Các bạn sử dụng trình giả lập này chỉ cần thêm một dòng dưới đây vào đầu chương trình là được:
+\begin{minted}[]{nasm}
+include 'emu8086.inc'
+\end{minted}
+Danh sách đầy đủ các thủ tục được hỗ trợ: \href{https://jbwyatt.com/253/emu/asm_tutorial_05.html}{Library of common functions: emu8086.inc}.
+
+
+\end{document}

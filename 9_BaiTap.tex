@@ -1,0 +1,225 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+\newcommand{\textD}{\textcolor{OliveGreen}{\cd{Đ}}}
+\newcommand{\textS}{\textcolor{red}{\cd{S}}}
+
+\section{Đề bài}
+\paragraph{Bài 1} Viết chương trình nhập vào một kí tự. Hãy in ra kí tự liền trước và liền sau của nó.
+\paragraph{Bài 2} Viết chương trình chuyển một chuỗi kí tự sang chữ hoa và in lại nó ra màn hình. Chuỗi ký tự đó được định nghĩa dưới dạng biến và kết thúc bằng \verb#$# (ASCII: \cd{24h}).
+\paragraph{Bài 3} Viết chương trình nhập vào một kí tự. Hãy cho biết nó là chữ hoa, chữ thường hay ký số?
+\paragraph{Bài 4*} Viết thủ tục convert một số thập phân 8-bit thành chuỗi kí tự tương ứng. Số thập phân được truyền vào qua \cd{al}, địa chỉ chuỗi đích được truyền vào qua thanh ghi \cd{di}.\\Vd: chuyển số \cd{1234} thành chuỗi \cd{"1234"}. Không sử dụng thư viện.
+\paragraph{Bài 5} Viết chương trình tính $\left(\sum^{n}_{x=1}x\right)$ với $n$ là số nguyên không dấu 8-bit ($n$ được định nghĩa dưới dạng biến).
+\paragraph{Bài 6} Viết chương trình nhập vào chuỗi kí tự. Hãy in lại chuỗi kí tự đó ra màn hình.
+\paragraph{Bài 7} Viết chương trình nhập vào một số nguyên dương và in ra màn hình tổng các chữ số của số đó.
+\paragraph{Bài 8} Viết chương trình nhập vào 2 số nguyên dương có 1 chữ số. Tính tổng của chúng và in ra màn hình (sử dụng hàm convert số sang chuỗi ở câu 4 hoặc dùng hàm thư viện để xuất số).
+\paragraph{Bài 9*} Viết chương trình nhập vào chuỗi kí tự. Hãy chuyển nó sang chữ hoa và in lại nó ra màn hình. (kết hợp bài 4 và bài 8).\bigskip
+
+Những bài này khá dài, mang tính tham khảo là chính (thi có thể chỉ bắt viết một phần nhỏ) vì đi thi mà code giấy nguyên cả mấy cái này chắc gãy tay quá \verb#:v#.\bigskip
+
+Những bạn có học cách sử dụng hàm \cd{printf}, \cd{scanf} có thể đổi những đề ``nhập số nguyên dương có một chữ số'' thành ``nhập số nguyên dương''. Cũng cần lưu ý kích thước của các thanh ghi (nhất là các thanh ghi dùng để truy xuất bộ nhớ \cd{esi}, \cd{edi}, \cd{ebx}, ...) nếu các bạn sử dụng Assembly x86 32-bit. 
+\pagebreak
+
+\section{Đáp án và giải thích}
+Các bạn có thể chép code của các bài này để chạy thử từ Github: \href{https://github.com/hungngocphat01/LaTex-ComputerSystem-2021}{hungngocphat01/LaTex-ComputerSystem-2021} (code nằm trong thư mục \cd{answer\_source}).\\
+Code đã được test trên emu8086.\bigskip
+
+Lớp nào học code trên Visual Studio thì tự tham khảo phần nhập/xuất dữ liệu (bằng \cd{printf, scanf, ...}) vì cái đó lớp mình không học nên chịu \verb#:v#. Còn phần code xử lý thì cơ bản là giống. Tuy nhiên, cần phải lưu ý kích thước các thanh ghi (đặc biệt là thanh ghi con trỏ như \cd{esi} thay cho \cd{si}, ...) cũng như cú pháp của các lệnh tính toán số học vì có thể chúng hơi khác.
+\renewcommand{\fcolorbox}[4][]{#4}
+%--------------------------------------------------
+\paragraph*{Bài 1}
+Kiến thức cần nhớ:
+\begin{itemize}
+    \item Với các hàm hệ thống của MS-DOS, khi bạn nhập một kí tự từ bàn phím vào, nó sẽ được lưu dưới dạng một số nguyên là mã ASCII của kí tự đó.\\
+        Vd: khi bạn nhập chữ \cd{'a'}, giá trị được lưu lại là số \cd{97}.
+    \item Khi bạn xuất một số nguyên ra màn hình, dữ liệu được xuất không phải là số nguyên đó mà là kí tự tương ứng với mã ASCII biểu diễn bởi số nguyên đó. Chi tiết xem ở phần \nameref{sec:nhapxuatdl}.\\
+        Vd: khi bạn ``xuất số'' \cd{97}, chương trình sẽ xuất chữ \cd{'a'} ra màn hình.
+    \item Kí tự liền liền sau và liền trước của một kí tự có mã ASCII hơn/kém kí tự đó 1 đơn vị.
+\end{itemize}
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai1.asm}
+%-------------------------------------------------
+\paragraph*{Bài 2}
+Kiến thức cần nhớ:
+\begin{itemize}
+    \item \nameref{subsec:xuatchuoi}
+    \item \nameref{subsec:whiledo}
+    \item Cách vòng lặp \cd{for} hoạt động (NMLT).
+    \item Ở bên dưới là sơ đồ thuật toán để biến một chuỗi \cd{str} từ in thường thành chuỗi in hoa. Trong thuật toán này mình sẽ dùng \cd{bx} làm thanh ghi con trỏ chuỗi và \cd{si} làm ``biến chạy''.\\
+    Mình sẽ sử dụng một vòng lặp \cd{for} tuỳ chỉnh như sau (thực tế là vòng lặp \cd{while-do}):
+\begin{minted}[breaklines]{c}
+for (int si = 0; bx[si] != '$'; si++) {
+    // bx[si] < 'a' or bx[si] > 'z' nghĩa là bx[si] không phải kí tự in thường.
+    // Do trong Assembly không thể OR điều kiện nên ta tách ra như sau
+    if (bx[si] < 'a') {
+        continue;
+    }
+    if (bx[si] > 'z') {
+        continue;
+    }
+    bx[si] -= 32; 
+    // 32 là khoảng cách giữa 'a' và 'A'
+}
+\end{minted}
+    \begin{figure}[H]
+        \begin{tikzpicture}[node distance=2cm and 2cm]
+            \node[process] (assign) {\cd{bx := địa chỉ(str)} };
+            \node[decision,below=of assign] (checkA) {\cd{bx[si] >= 'a'?}};
+            \node[decision,right=of checkA] (checkZ) {\cd{bx[si] <= 'z'?}};
+            \node[process,right=of checkZ] (capitalize) {\cd{bx[si] := bx[si] - 32}};
+            \node[process,below=of checkA] (nextchar) {\verb#si++#};
+            \node[decision,below=of nextchar] (while) {\cd{bx[si] = '\$'?}};             
+            \node[startstop,right=of while] (stop) {Kết thúc};
+
+            \draw[arrow] (assign) -- coordinate[midway] (begin) (checkA);
+            \draw[arrow] (checkA) -- node[anchor=south]{\textD} (checkZ);
+            \draw[arrow] (checkA) -- coordinate[midway] (anext) node[anchor=east]{\textS} (nextchar);
+            \draw[arrow] (nextchar) -- (while);
+            \draw[arrow] (while) -- node[anchor=south]{\textD} (stop);
+            \draw[arrow] (while.west) -- node[anchor=north,near start]{\textS} +(-2,0) |- (begin.west); 
+            \draw[arrow] (checkZ) -- node[anchor=south]{\textD} (capitalize);
+            \draw[arrow] (checkZ) |- node[anchor=west,near start]{\textS} (nextchar);
+        \end{tikzpicture}
+    \end{figure}
+\end{itemize}
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai2.asm}
+
+
+%--------------------------------------------------
+\paragraph*{Bài 3}
+Các kiến thức cần nhớ:
+\begin{itemize}
+    \item \nameref{subsec:label}
+    \item \nameref{subsec:jmp}
+    \item \nameref{subsec:jxx}
+\end{itemize}
+Cần lưu ý lệnh so sánh trong Assembly không thể \verb#&&# được như \cd{if} trong C nên ta phải viết kiểu như sau:
+\begin{minted}[]{cpp}
+if (A && B) {
+    ...
+}
+// Chuyển thành
+if (A) {
+    if (B) {
+        ...
+    }
+}
+\end{minted}
+Cụ thể, thuật toán so sánh cho bài này là: (trang sau)
+
+\begin{figure}[H]
+\centering
+\tikzset{node distance = 4.5cm and 4.5cm}
+
+\begin{tikzpicture}
+
+\coordinate (in) {};
+\node[io,text width=3cm] (input) {Nhập kí tự, lưu vào \cd{BL}};
+% Các khối if
+\node[decision,below of=input] (capitalA) {\cd{BL >= 'A'?}};
+\node[decision,right of=capitalA] (capitalZ) {\cd{BL <= 'Z'?}};
+\node[decision,below of=capitalA] (lowerA) {\cd{BL >= 'a'?}};
+\node[decision,right of=lowerA] (lowerZ) {\cd{BL <= 'z'?}};
+\node[decision,below of=lowerA] (number1) {\cd{BL >= '1'?}};
+\node[decision,right of=number1] (number9) {\cd{BL <= '9'?}};
+% Các khối kết quả 
+\node[io,right of=capitalZ,text width=2cm] (resultCapital) {\cd{BL} là chữ hoa};
+\node[io,right of=lowerZ,text width=2cm] (resultLower) {\cd{BL} là chữ thường};
+\node[io,right of=number9,text width=2cm] (resultDigit) {\cd{BL} là ký số};
+\node[io,below=3cm of resultDigit,text width=3cm] (else) {Các trường hợp khác (\cd{else})};
+% Khối out 
+\node[startstop, right=2cm of else] (end) {End if};
+
+% Mũi tên cho khối if
+\draw[arrow] (input) -- (capitalA);
+\draw[arrow] (capitalA) -- node[anchor=south]{\textD} (capitalZ);
+\draw[arrow] (lowerA) -- node[anchor=south]{\textD} (lowerZ);
+\draw[arrow] (capitalA) -- node[anchor=east]{\textS} coordinate[midway] (midAa) (lowerA);
+\draw[arrow] (number1) -- node[anchor=south]{\textD} (number9);
+\draw[arrow] (lowerA) -- node[anchor=east]{\textS} coordinate[midway] (mida1) (number1);
+\draw[arrow] (number1) |- node[anchor=east,near start] {\textS} coordinate[midway] (mid1e) (else);
+% Mũi tên cho khối kết quả 
+\draw[arrow] (capitalZ) -- node[anchor=south]{\textD} (resultCapital);
+\draw[arrow] (lowerZ) -- node[anchor=south]{\textD} (resultLower);
+\draw[arrow] (number9) -- node[anchor=south]{\textD} (resultDigit);
+
+\draw[arrow] (capitalZ) |- node[anchor=south west]{\textS} (midAa);
+\draw[arrow] (lowerZ) |- node[anchor=south west]{\textS} (mida1);
+\draw[arrow] (number9) |- node[anchor=south west,near start]{\textS} (else);
+
+\draw[arrow] (else) -- (end);
+\draw[arrow] (resultCapital) -| (end);
+\draw[arrow] (resultDigit) -| (end);
+\draw[arrow] (resultLower) -| (end);
+
+\end{tikzpicture}
+\end{figure}
+\pagebreak
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai3.asm}
+%---------------------------------------------------
+\paragraph*{Bài 4*}
+Kiến thức cần nhớ:
+\begin{itemize}
+    \item \nameref{subsec:phepchia}
+    \item \nameref{subsec:whiledo}
+    \item \nameref{subsec:for}
+    \item \nameref{sec:thutuc}
+    \item \nameref{sec:stack}
+\end{itemize}
+Cách chuyển một số thập phân \cd n sang chuỗi kí tự \cd s:
+\begin{enumerate}
+    \item Gán biến đếm \cd{count = 0}.
+    \item Nếu \cd{n = 0}, kết thúc.
+    \item Chia \cd n cho 10. Lưu lại phần thương và phần dư.
+    \item Đẩy phần dư vào stack.
+    \item Tăng biến đếm lên 1.
+    \item Tiếp tục lấy phần thương chia cho 10.\bigskip
+    \item Quay lại bước 2.
+    \item Pop các chữ số nằm trong stack ra và gán vào chuỗi. Lặp lại bước này \cd{count} lần.
+    \item Kết thúc.
+\end{enumerate}
+Ta sử dụng cấu trúc dữ liệu stack vì khi lấy \cd n chia liên tiếp cho 10 thì ta thu được dãy các chữ số của \cd n cho thứ tự ngược lại. Do đó ta sử dụng stack để chuyển dãy ngược đó thành dãy xuôi (tính chất của stack là last in first out).\par 
+Lưu ý: do giới hạn của vi xử lý 8086 và mức độ cơ bản của bài toán, cài đặt bên dưới chỉ có thể chuyển các số từ \cd{2559} trở xuống. Nếu lớn hơn sẽ bị tràn số.
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai4.asm}
+%---------------------------------------------------
+\paragraph*{Bài 5}
+Kiến thức cần nhớ:
+\begin{itemize}
+    \item \nameref{subsec:phepcong}
+    \item \nameref{subsec:for}
+\end{itemize}
+Trong cài đặt dưới đây, mình sẽ sử dụng thư viện \cd{emu8086.inc} để in kết quả cho tiện. Để biết thêm thông tin về thư viện, xem phần \nameref{sec:emu8086}.\\
+Lệnh in số chỉ có tác dụng minh hoạ. Đi thi nếu có tự luận chưa chắc được phép dùng thư viện ngoài.
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai5.asm}
+%---------------------------------------------------
+\paragraph*{Bài 6}
+Kiến thức cần nhớ:
+\begin{itemize}
+    \item Cấu trúc của buffer chuỗi kí tự khi nhập chuỗi bằng hàm \cd{int 21h, ah = 0ah} trong Assembly 8086.
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[mybox/.style={minimum width=3cm,draw,thick,align=center,minimum height=1.5cm}]
+            \node[mybox,text width=3cm] (a) {\cd{Số lượng ký tự tối đa}};
+            \node[right=-1pt of a, mybox,text width=3cm] (b) {\cd{Số lượng ký tự HĐH đọc được}};
+            \node[right=-1pt of b, mybox,minimum width] (c) {\cd{Nội dung thực sự của chuỗi}};
+
+            \node[left=0.5cm of a] {\cd{Biến chuỗi}};
+            \node[below= 5pt of a] {\cd{Byte số 0}};
+            \node[below= 5pt of b] {\cd{Byte số 1}};
+            \node[below= 5pt of c] {\cd{Byte số 3 trở đi}};
+        \end{tikzpicture}
+    \end{figure}
+        Chính vì vậy, sau khi đọc chuỗi xong (địa chỉ chuỗi lưu trong thanh ghi \cd{dx}), nội dung thực sự của chuỗi sẽ bắt đầu từ vị trí \cd{[dx + 2]} trở đi (offset 2). Thông tin chi tiết xem phần \nameref{subsec:docchuoi}.
+    \item Hàm này cũng không tự chèn dấu \verb#$# vào cuối chuỗi, trong khi hàm xuất chuỗi lại cần dấu \verb#$# để đánh dấu vị trí kết thúc chuỗi (giống như kí tự \cd{NULL} trong C). Để thuận tiện, khi khai báo chuỗi ta sẽ gán cho mọi phần tử của chuỗi là dấu \verb#$#.
+\end{itemize}
+
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai6.asm}
+
+%---------------------------------------------------
+
+
+
+\end{document}

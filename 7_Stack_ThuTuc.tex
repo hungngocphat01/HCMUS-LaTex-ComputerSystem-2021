@@ -1,7 +1,7 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
 
-\section{Stack}
+\section{Stack} \label{sec:stack}
 Stack là một vùng nhớ nằm trên RAM, được xác định bởi địa chỉ chứa trong thanh ghi SS.\\
 Đỉnh của stack được xác định bởi địa chỉ được lưu trong thanh ghi \cd{SP} là \cd{SS:[SP]}.\\
 Stack trong CPU 8086 được lưu theo theo chiều ``ngược'', nghĩa là khi ta push vào thì thanh ghi SP sẽ ``đi xuống''.\\
@@ -26,12 +26,13 @@ pop bx          ; stack -> bx
                 ; bx = 1234h
 \end{minted}
 
-\section{Thủ tục}
+\section{Thủ tục} \label{sec:thutuc}
 Khái niệm thủ tục trong Assembly giống với khái niệm hàm (void) trong C.\\
 Cách khai báo một thủ tục:
 \begin{minted}[]{asm}
 <tên thủ tục> proc 
     <nội dung thủ tục>
+    ret
 endp
 \end{minted}
 
@@ -41,6 +42,7 @@ swapAXBX proc
     push ax 
     mov ax, bx
     pop bx
+    ret
 endp
 \end{minted}
 

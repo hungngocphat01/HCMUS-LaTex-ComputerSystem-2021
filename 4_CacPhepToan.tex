@@ -1,7 +1,7 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
-\section{Các phép toán số học và logic}
-\subsection{Phép cộng}
+\section{Các phép toán số học và logic} \label{sec:pheptoan}
+\subsection{Phép cộng} \label{subsec:phepcong}
 \begin{minted}[]{asm}
 add dest, src
 \end{minted}
@@ -58,14 +58,14 @@ mul bx          ; DXAX = AX * BX = DEADh * DADh = 0BE543E9h
 
 Ngoài ra ta còn lệnh \cd{IMUL} với cú pháp tương tự, nhưng nó sẽ treat 2 toán hạng là 2 số có dấu.
 
-\subsection{Phép chia}
+\subsection{Phép chia} \label{subsec:phepchia}
 \begin{minted}[]{asm}
 div X
 \end{minted}
 Lệnh \cd{DIV} chia 2 số không dấu.
 Có 2 trường hợp xảy ra:
 \begin{itemize}
-    \item Nếu \cd{X} có kích thước 8 bit (1 byte), lệnh này sẽ thực hiện phép gán: \cd{AL = AX div X} (thương) và \cd{AH = AX mod X} (dư).
+    \item Nếu \cd{X} có kích thước 8 bit (1 byte), lệnh này sẽ thực hiện phép gán: \cd{AL = AX div X} (thương) và \cd{AH = AX mod X} (dư).  
     \par Biểu diễn dưới dạng chia Euler: \cd{AX = X*AL + AH}.
     \item Nếu \cd{X} có kích thước 16 bit (2 byte), lệnh này sẽ thực hiện phép gán: \cd{AX = DXAX div X} và \cd{DX = DXAX mod X}.
     \par Biểu diễn dưới dạng chia Euler: \cd{DXAX = X*AX + DX}.
