@@ -7,17 +7,15 @@ main proc
     mov ax, @data       ; Nap data vao data segment
     mov ds, ax                                     
     
-    lea bx, str         ; Nap dia chi chuoi vao bx
-
 _for:                   ; for(int i = 0; str[i] != '$'; i++) {               
-    cmp bx[si], 'a'     ;   if (str[i] < 'a') 
+    cmp str[si], 'a'    ;   if (str[i] < 'a') 
     jl _nextchar        ;       continue;
-    cmp bx[si], 'z'     ;   if (str[i] > 'z')
+    cmp str[si], 'z'    ;   if (str[i] > 'z')
     jg _nextchar        ;       continue;
-    sub bx[si], 32d     ;   str[i] -= 32;                          
+    sub str[si], 32d    ;   str[i] -= 32;                          
 _nextchar:              ; 
     inc si              ; Dòng này tương đương với i++ của vòng for  
-    cmp bx[si], 24h     ; Dòng này tương đương với xét điều kiện dừng của vòng for
+    cmp str[si], 24h    ; Dòng này tương đương với xét điều kiện dừng của vòng for
     jne _for            ; }  
     
     lea dx, str         ; In lai chuoi do ra man hinh

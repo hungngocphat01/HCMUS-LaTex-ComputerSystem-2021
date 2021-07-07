@@ -86,10 +86,13 @@ Giải thích:
     \end{itemize}
     \item Giả sử ta đã nhập vào chuỗi \cd{"Dm assembly kho vcl"}. Chuỗi này gồm có 18 ký tự. Biến \cd{str} sau khi nhập xong sẽ có giá trị là:
     \begin{verbatim}
-100, 18, "Dm assembly kho vcl$$$$$$$$$$$$$$$$..."
+100, 18, "Dm assembly kho vcl\r$$$$$$$$$$$$$$..."
     \end{verbatim} 
-    \par Sau chuỗi này là các dấu  \verb#'$'#, vì khi khai báo ta đã khai báo một chuỗi có 100 phần tử, nhưng chuỗi đọc được chỉ có 18 phần tử mà thôi. Do đó, 82 phần tử còn lại sẽ là \verb#'$'#.
-    \par Ta nên khai báo mảng gồm 100 dấu \verb#'$'# cho tiện in ra màn hình, vì quy định của hàm in ra màn hình là chuỗi phải kết thúc bằng dấu \verb#'$'#, nhưng hàm đọc chuỗi lại không tự thêm dấu \verb#'$'# vào cuối chuỗi sau khi đọc.
+    \par Ta nên khai báo mảng gồm 100 dấu \verb#'$'# cho tiện in ra màn hình, vì quy định của hàm in ra màn hình là chuỗi phải kết thúc bằng dấu \verb#'$'#, nhưng hàm đọc chuỗi lại không tự thêm dấu \verb#'$'# vào cuối chuỗi sau khi đọc.\bigskip
+    \par Sau chuỗi này là các dấu  \verb#'$'#, vì khi khai báo ta đã khai báo một chuỗi có 100 phần tử, nhưng chuỗi đọc được chỉ có 18 phần tử mà thôi. Do đó, 82 phần tử còn lại sẽ là \verb#'$'#. \bigskip
+    \par Ngoài ra ta còn thấy \verb#'\r'#, vì khi nhấn phím \cd{ENTER} thì dấu \verb#'\r\n'# sẽ được tự chèn vào chuỗi (\verb#'\n'# được bỏ qua). Nếu sau khi nhập xong, chuỗi này ta dùng để xử lý như một chuỗi thông thường thì \verb#'\r'# không ảnh hưởng gì nhiều. Nhưng nếu ta sử dụng nó để xử lý số, ta phải cẩn thận, phải gán nó thành dấu \cd{'\$'} hoặc một ký hiệu quy ước khác để tiện xử lý.
+
+
 \end{itemize}
 
 \subsection*{Trở về DOS}

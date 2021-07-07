@@ -24,7 +24,7 @@ main proc
     ; bx tro den vi tri thuc cua chuoi
     add bx, 2
     ; Chuyen thanh chu in hoa:
-_while:                     ; do {               
+_for:                       ; do {               
     cmp bx[si], 'a'         ;   if (str[i] <= 'a') 
     jl _nextchar            ;       goto nextchar;
     cmp bx[si], 'z'         ;   if (str[i] >= 'z')
@@ -32,9 +32,8 @@ _while:                     ; do {
     sub bx[si], 32d         ;   str[i] -= 32                          
 _nextchar:                  ; #nextchar:
     inc si                  ;   i++;
-    dec cx                  ;   cx--;
-    cmp cx, 0               ; } while (cx != 0);
-    jne _while                
+    cmp bx[si], '$'         ; } while (cx != '$');
+    jne _for                
     
     mov ah, 02h             ; cout << end;
     mov dl, 10d             ; print \n

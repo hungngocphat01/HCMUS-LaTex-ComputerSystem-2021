@@ -10,9 +10,19 @@
 \paragraph{Bài 4*} Viết thủ tục convert một số thập phân 8-bit thành chuỗi kí tự tương ứng. Số thập phân được truyền vào qua \cd{al}, địa chỉ chuỗi đích được truyền vào qua thanh ghi \cd{di}.\\Vd: chuyển số \cd{1234} thành chuỗi \cd{"1234"}. Không sử dụng thư viện.
 \paragraph{Bài 5} Viết chương trình tính $\left(\sum^{n}_{x=1}x\right)$ với $n$ là số nguyên không dấu 8-bit ($n$ được định nghĩa dưới dạng biến).
 \paragraph{Bài 6} Viết chương trình nhập vào chuỗi kí tự. Hãy in lại chuỗi kí tự đó ra màn hình.
-\paragraph{Bài 7} Viết chương trình nhập vào một số nguyên dương và in ra màn hình tổng các chữ số của số đó.
-\paragraph{Bài 8} Viết chương trình nhập vào 2 số nguyên dương có 1 chữ số. Tính tổng của chúng và in ra màn hình (sử dụng hàm convert số sang chuỗi ở câu 4 hoặc dùng hàm thư viện để xuất số).
-\paragraph{Bài 9*} Viết chương trình nhập vào chuỗi kí tự. Hãy chuyển nó sang chữ hoa và in lại nó ra màn hình. (kết hợp bài 4 và bài 8).\bigskip
+\paragraph{Bài 7} Viết chương trình in ra màn hình tổng các chữ số của một số nguyên dương không dấu. ``Số'' được định nghĩa trong data section dưới dạng chuỗi kí tự kết thúc bằng \verb#$#. 
+\paragraph{Bài 7+} Thử viết lại bài 7 với số nguyên dương đó được định nghĩa dưới dạng số nguyên dương 16-bit (\cd{dw})? Gợi ý: tham khảo câu 4.
+
+\paragraph{Bài 8} Viết chương trình nhập vào 2 ký số $m, n$ và một ký tự \cd{c}. Hãy vẽ một hình chữ nhật $m\times n$ bằng ký tự \cd{c}?\\
+Ví dụ:
+\begin{verbatim}
+Input:              Output:
+m = 4               &&&&&               
+n = 5               &&&&& 
+c = &               &&&&&
+\end{verbatim}
+
+\paragraph{Bài 9*} Viết chương trình nhập vào chuỗi kí tự. Hãy chuyển nó sang chữ hoa và in lại nó ra màn hình. (kết hợp bài 2 và bài 6).\bigskip
 
 Những bài này khá dài, mang tính tham khảo là chính (thi có thể chỉ bắt viết một phần nhỏ) vì đi thi mà code giấy nguyên cả mấy cái này chắc gãy tay quá \verb#:v#.\bigskip
 
@@ -41,11 +51,12 @@ Kiến thức cần nhớ:
 \paragraph*{Bài 2}
 Kiến thức cần nhớ:
 \begin{itemize}
+    \item \nameref{subsec:truycapmang}\par Lưu ý: ta chỉ có thể sử dụng 2 thanh ghi \cd{SI, DI} làm ``biến chạy'' để truy cập vào mảng. 
     \item \nameref{subsec:xuatchuoi}
     \item \nameref{subsec:whiledo}
     \item Cách vòng lặp \cd{for} hoạt động (NMLT).
     \item Ở bên dưới là sơ đồ thuật toán để biến một chuỗi \cd{str} từ in thường thành chuỗi in hoa. Trong thuật toán này mình sẽ dùng \cd{bx} làm thanh ghi con trỏ chuỗi và \cd{si} làm ``biến chạy''.\\
-    Mình sẽ sử dụng một vòng lặp \cd{for} tuỳ chỉnh như sau (thực tế là vòng lặp \cd{while-do}):
+    Mình sẽ sử dụng một vòng lặp \cd{for} tuỳ chỉnh như sau:
 \begin{minted}[breaklines]{c}
 for (int si = 0; bx[si] != '$'; si++) {
     // bx[si] < 'a' or bx[si] > 'z' nghĩa là bx[si] không phải kí tự in thường.
@@ -60,26 +71,28 @@ for (int si = 0; bx[si] != '$'; si++) {
     // 32 là khoảng cách giữa 'a' và 'A'
 }
 \end{minted}
-    \begin{figure}[H]
-        \begin{tikzpicture}[node distance=2cm and 2cm]
-            \node[process] (assign) {\cd{bx := địa chỉ(str)} };
-            \node[decision,below=of assign] (checkA) {\cd{bx[si] >= 'a'?}};
-            \node[decision,right=of checkA] (checkZ) {\cd{bx[si] <= 'z'?}};
-            \node[process,right=of checkZ] (capitalize) {\cd{bx[si] := bx[si] - 32}};
-            \node[process,below=of checkA] (nextchar) {\verb#si++#};
-            \node[decision,below=of nextchar] (while) {\cd{bx[si] = '\$'?}};             
-            \node[startstop,right=of while] (stop) {Kết thúc};
+Tuy nhiên, để thuận tiện cho việc cài đặt, mình sẽ viết lại nó trong hợp ngữ dưới dạng \cd{do-while}. Chi tiết hơn xem lưu đồ bên dưới:
 
-            \draw[arrow] (assign) -- coordinate[midway] (begin) (checkA);
-            \draw[arrow] (checkA) -- node[anchor=south]{\textD} (checkZ);
-            \draw[arrow] (checkA) -- coordinate[midway] (anext) node[anchor=east]{\textS} (nextchar);
-            \draw[arrow] (nextchar) -- (while);
-            \draw[arrow] (while) -- node[anchor=south]{\textD} (stop);
-            \draw[arrow] (while.west) -- node[anchor=north,near start]{\textS} +(-2,0) |- (begin.west); 
-            \draw[arrow] (checkZ) -- node[anchor=south]{\textD} (capitalize);
-            \draw[arrow] (checkZ) |- node[anchor=west,near start]{\textS} (nextchar);
-        \end{tikzpicture}
-    \end{figure}
+\begin{figure}[H]
+\begin{tikzpicture}[node distance=2cm and 2cm]
+    \node[process] (assign) {\cd{bx := địa chỉ(str)} };
+    \node[decision,below=of assign] (checkA) {\cd{bx[si] >= 'a'?}};
+    \node[decision,right=of checkA] (checkZ) {\cd{bx[si] <= 'z'?}};
+    \node[process,right=of checkZ] (capitalize) {\cd{bx[si] := bx[si] - 32}};
+    \node[process,below=of checkA] (nextchar) {\verb#si++#};
+    \node[decision,below=of nextchar] (while) {\cd{bx[si] = '\$'?}};             
+    \node[startstop,right=of while] (stop) {Kết thúc};
+
+    \draw[arrow] (assign) -- coordinate[midway] (begin) (checkA);
+    \draw[arrow] (checkA) -- node[anchor=south]{\textD} (checkZ);
+    \draw[arrow] (checkA) -- coordinate[midway] (anext) node[anchor=east]{\textS} (nextchar);
+    \draw[arrow] (nextchar) -- (while);
+    \draw[arrow] (while) -- node[anchor=south]{\textD} (stop);
+    \draw[arrow] (while.west) -- node[anchor=north,near start]{\textS} +(-2,0) |- (begin.west); 
+    \draw[arrow] (checkZ) -- node[anchor=south]{\textD} (capitalize);
+    \draw[arrow] (checkZ) |- node[anchor=west,near start]{\textS} (nextchar);
+\end{tikzpicture}
+\end{figure}
 \end{itemize}
 
 \inputminted[linenos,breaklines]{nasm}{answer_source/Bai2.asm}
@@ -166,6 +179,7 @@ Kiến thức cần nhớ:
     \item \nameref{subsec:for}
     \item \nameref{sec:thutuc}
     \item \nameref{sec:stack}
+    \item \nameref{sec:truycapmang} \par Lưu ý: ta chỉ có thể sử dụng \cd{BP, BX} cùng với \cd{SI, DI} làm con trỏ để truy cập vào các vùng nhớ, do đó ta cần nạp địa chỉ chuỗi vào \cd{BX} (hoặc \cd{BP}).
 \end{itemize}
 Cách chuyển một số thập phân \cd n sang chuỗi kí tự \cd s:
 \begin{enumerate}
@@ -191,7 +205,8 @@ Kiến thức cần nhớ:
     \item \nameref{subsec:for}
 \end{itemize}
 Trong cài đặt dưới đây, mình sẽ sử dụng thư viện \cd{emu8086.inc} để in kết quả cho tiện. Để biết thêm thông tin về thư viện, xem phần \nameref{sec:emu8086}.\\
-Lệnh in số chỉ có tác dụng minh hoạ. Đi thi nếu có tự luận chưa chắc được phép dùng thư viện ngoài.
+
+Lệnh in số chỉ có tác dụng minh hoạ. Đi thi nếu có tự luận chưa chắc được phép dùng thư viện ngoài. Lưu ý là hàm \cd{PRINT\_NUM\_UNS} được sử dụng trong bài sẽ in một số nguyên không dấu trong thanh ghi \cd{AX} ra màn hình.
 
 \inputminted[linenos,breaklines]{nasm}{answer_source/Bai5.asm}
 %---------------------------------------------------
@@ -219,7 +234,41 @@ Kiến thức cần nhớ:
 \inputminted[linenos,breaklines]{nasm}{answer_source/Bai6.asm}
 
 %---------------------------------------------------
+\paragraph*{Bài 7}
+Kiến thức cần nhớ 
+\begin{itemize}
+    \item \nameref{subsec:phepcong}
+    \item \nameref{subsec:whiledo}
+    \item Để xuất kết quả ra màn hình, mình sẽ sử dụng thư viện chuẩn. Lưu ý là việc này chỉ mang tính chất minh hoạ, chưa chắc được dùng khi thi tự luận (nếu có). Chi tiết xem ở \nameref{sec:emu8086}.
+    \item \nameref{subsec:truycapmang}.
+\end{itemize}
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai7.asm}
 
+\paragraph*{Bài 7+}
+Tự kết hợp câu 6 và câu 7. Không có đáp án. Đọc kỹ phần \nameref{subsec:docchuoi}.
+%---------------------------------------------------
 
+\paragraph*{Bài 8}
+Ta có thể làm rất đơn giản bằng C như sau (ở đây mình viết bằng while-do để lát nữa tiện chuyển sang Assembly):
+\begin{minted}[linenos]{c}
+int m, n;
+int c;
+cin >> m >> n >> c;
 
+int bh = m;     // 2 biến chạy
+while (bh != 0) {
+    bl = n;
+    while (bl != 0) {
+        cout << c;
+        bl--;
+    }
+    cout << "\r\n";
+    bh--;
+}
+\end{minted}
+Kiến thức cần nhớ: \nameref{subsec:whiledo}.
+\inputminted[linenos,breaklines]{nasm}{answer_source/Bai8.asm}
+%---------------------------------------------------
+\paragraph*{Bài 9}
+Tự kết hợp câu 2 và 6. Đáp án trên github (do để ở đây thì dài quá).
 \end{document}

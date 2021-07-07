@@ -1,14 +1,15 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
 
-\section{Truy cập bộ nhớ}
+\section{Truy cập bộ nhớ} \label{sec:truycapbn}
 \subsection{Sơ lược về truy cập bộ nhớ}
-Để truy cập vào một ô nhớ, ta có thể chứa địa chỉ offset của ô nhớ đó trong
+Để truy cập vào một ô nhớ thông qua địa chỉ của nó (như là con trỏ của C), ta có thể chứa địa chỉ offset của ô nhớ đó trong
 \begin{itemize}
-    \item Một thanh ghi con trỏ như \cd{SI, DI}.
-    \item Thanh ghi \cd{BX}.
+    \item Thanh ghi \cd{BX}, \cd{BP}.
+    \item Thanh ghi con trỏ như \cd{SI, DI}.
     \item Truy cập trực tiếp vào địa chỉ của ô nhớ đó (displacement). Có 2 loại địa chỉ là địa chỉ 8-bit (\cd{d8}) và địa chỉ 16-bit (\cd{d16}).
 \end{itemize}
+Hoặc ta cũng có thể kết hợp chúng lại, sẽ nói chi tiết hơn ở phần \nameref{subsec:truycapmang}.
 
 \textit{Lưu ý: Địa chỉ được chứa trong các thanh ghi SI, DI, BX hoặc d8, d16 là các địa chỉ offset. Địa chỉ vật lý thực sự của các ô nhớ đó thực chất là \cd{DS:SI}, \cd{DS:DI}, \cd{DS:BX}, \cd{DS:d8}, \cd{DS:d16}. Cũng cần phải lưu ý một ô nhớ có kích thước là 1 byte}.
 \bigskip
@@ -167,7 +168,7 @@ mov ax, [bx]           ; ax = *(ds*10h+bx)
                        ; Nhắc lại: SI, DI, BX luôn luôn đi ngầm định với DX
 \end{minted}
 
-\subsection{Truy cập vào mảng}
+\subsection{Truy cập vào mảng} \label{subsec:truycapmang}
 Ta có thể truy cập vào mảng bằng cú pháp như trong C (có một số chỗ hơi khác một tí):
 \begin{minted}[]{asm}
 arr1 db 0Ah, 0Bh, 0Ch, 0Dh, 0Eh 
@@ -175,8 +176,31 @@ arr1 db 0Ah, 0Bh, 0Ch, 0Dh, 0Eh
 mov al, arr         ; al = 0Ah 
 mov al, arr[0]      ; al = 0Ah 
 mov al, arr[2]      ; al = 0Ch 
-mov bx, offset arr  ; bx = địa chỉ của arr
-mov al, [bx + 3]    ; al = *(bx + 3) = *(arr + 3) = arr[3]
+\end{minted}
+Nếu ta muốn lặp qua mảng (như sử dụng \cd{for(int i = ...)} trong C), ta chỉ có thể sử dụng 1 trong 2 thanh ghi \cd{SI} hoặc \cd{DI} làm ``biến chạy'' thay cho \cd{i}.
+
+Ta cũng có thể truy cập gián tiếp vào mảng thông qua con trỏ. Khi đó ta cần chứa địa chỉ của mảng ở một trong 2 thanh ghi \cd{BX} hoặc \cd{BP}.
+\begin{minted}[]{asm}
+arr1 db 0Ah, 0Bh, 0Ch, 0Dh, 0Eh 
+... 
+mov bx, offset arr 
+mov al, bx[2]      ; al = 0Ch 
+
+mov si, 3
+mov al, bx[si]     ; al = 0Dh 
+
+mov al, bx[cx]     ; KHÔNG ĐƯỢC, chỉ có thể sử dụng SI/DI làm index 
+mov al, dx[si]     ; KHÔNG ĐƯỢC, chỉ có thể sử dụng BX/BP làm base pointer
+\end{minted}
+
+Ví dụ:
+\begin{minted}[]{nasm}
+.data 
+    arr 0ah, 0bh, 0ch, 0dh 
+.code 
+... 
+lea bx, arr     ; bx = địa chỉ mảng 
+mov ax, bx[3]   ; 
 \end{minted}
 
 \subsection{Lệnh \cd{lea}}
